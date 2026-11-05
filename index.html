@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC ESPORTS — TOURNAMENT HUB</title>
+<link rel="icon" href="https://i.imgur.com/jiS3Xh7.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+:root{
+  --teal-950:#04100f; --teal-900:#062b2d; --teal-800:#0b3d3f; --teal-700:#0d5f5f;
+  --cyan:#14e3e3; --cyan-l:#9be8e4;
+  --gold:#d9b64a; --gold-l:#f0d98c; --gold-d:#a8873a;
+  --black:#060a0a;
+  --ios-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--ios-font);color:#e8f4f3;min-height:100dvh;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(217,182,74,.10), transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, rgba(13,95,95,.30), transparent 60%),
+    linear-gradient(160deg,#04100f 0%, #062b2d 55%, #03100f 100%);
+}
+/* ============ PREMIUM TEAL HEADER ============ */
+header{
+  position:relative;overflow:hidden;
+  padding:18px 22px 16px;
+  background:linear-gradient(135deg,#0d5f5f 0%, #0b3d3f 45%, #062b2d 100%);
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+}
+header::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(600px 200px at 15% 0%, rgba(20,227,227,.18), transparent 60%),
+    linear-gradient(90deg, transparent, rgba(217,182,74,.08), transparent);
+}
+header::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-l),transparent);
+}
+.hdr-inner{position:relative;display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:60px;}
+.hdr-text{flex:1;min-width:200px;}
+h1{
+  font-family:'Orbitron',var(--ios-font);font-weight:900;
+  font-size:clamp(15px,2.4vw,26px);letter-spacing:3px;
+  background:linear-gradient(90deg,#f0d98c,#d9b64a 45%,#9be8e4);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+.hdr-sub{letter-spacing:3px;font-size:10px;color:var(--cyan-l);opacity:.9;margin-top:4px;font-weight:600;}
+.hdr-badge{
+  font-size:10px;letter-spacing:3px;color:#04100f;
+  background:linear-gradient(90deg,#f0d98c,#d9b64a);
+  padding:6px 12px;border-radius:20px;font-weight:800;
+  box-shadow:0 4px 12px rgba(217,182,74,.4);white-space:nowrap;
+}
+.logo-main{height:56px;width:auto;flex:0 0 auto;object-fit:contain;filter:drop-shadow(0 4px 14px rgba(0,0,0,.4));}
+.live-dot{
+  display:inline-flex;align-items:center;gap:7px;margin-left:10px;
+  font-size:9px;letter-spacing:2px;font-weight:800;color:#ff6b6b;
+  border:1px solid rgba(255,107,107,.5);padding:4px 10px;border-radius:20px;
+  background:rgba(255,107,107,.08);vertical-align:middle;
+}
+.live-dot.on{color:#4ade80;border-color:rgba(74,222,128,.5);background:rgba(74,222,128,.08);}
+.live-dot i{animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ============ NAV TABS ============ */
+nav.tabs{
+  position:sticky;top:0;z-index:900;display:flex;gap:6px;flex-wrap:wrap;
+  padding:10px 16px;background:rgba(4,16,15,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(217,182,74,.3);
+}
+nav.tabs button{
+  font-family:'Orbitron',var(--ios-font);font-size:10px;letter-spacing:2px;font-weight:700;
+  color:var(--cyan-l);background:rgba(13,95,95,.25);border:1px solid rgba(217,182,74,.3);
+  border-radius:10px;padding:9px 14px;cursor:pointer;transition:.15s;min-height:38px;
+  display:inline-flex;align-items:center;gap:7px;
+}
+nav.tabs button i{color:var(--gold-l);}
+nav.tabs button:hover{border-color:var(--gold);color:#fff;}
+nav.tabs button.active{
+  background:linear-gradient(135deg,#f0d98c,#d9b64a);color:#04100f;border-color:var(--gold);
+  box-shadow:0 4px 14px rgba(217,182,74,.4);
+}
+nav.tabs button.active i{color:#04100f;}
+
+main{padding:20px 22px 60px;max-width:1700px;margin:0 auto;}
+.view{display:none;}
+.view.active{display:block;}
+
+/* ============ PANELS & CONTROLS ============ */
+.panel{
+  background:linear-gradient(165deg,rgba(13,95,95,.40),rgba(4,16,15,.75));
+  border:1px solid rgba(217,182,74,.35);border-radius:14px;padding:18px;margin-bottom:18px;
+  box-shadow:0 8px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.panel h2{
+  font-family:'Orbitron',var(--ios-font);font-weight:700;font-size:12px;letter-spacing:4px;color:var(--gold-l);
+  margin-bottom:14px;display:flex;align-items:center;gap:10px;
+}
+.panel h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(217,182,74,.7),transparent);}
+label.f{display:block;font-size:13px;color:var(--gold-l);margin:10px 0 5px;font-weight:600;}
+input[type=text],input[type=number],textarea,select{
+  width:100%;background:rgba(4,18,17,.8);border:1px solid rgba(217,182,74,.3);border-radius:10px;
+  color:#fff;font-family:var(--ios-font);font-size:15px;padding:10px 12px;outline:none;transition:.15s;
+  min-height:44px;
+}
+textarea{min-height:120px;resize:vertical;line-height:1.6;}
+input[type=text]:focus,input[type=number]:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,182,74,.2);}
+.btn{
+  letter-spacing:1px;font-size:12px;font-weight:700;border:none;cursor:pointer;border-radius:10px;
+  padding:10px 16px;min-height:44px;color:#04100f;
+  background:linear-gradient(135deg,#f0d98c,#d9b64a 60%,#b8933a);
+  box-shadow:0 4px 14px rgba(217,182,74,.35);transition:.15s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(217,182,74,.5);}
+.btn.ghost{background:transparent;color:var(--gold-l);border:1px solid rgba(217,182,74,.5);box-shadow:none;}
+.btn.ghost:hover{border-color:var(--gold);box-shadow:0 0 12px rgba(217,182,74,.25);}
+.btn.teal{background:linear-gradient(135deg,#14e3e3,#0d5f5f);color:#04100f;box-shadow:0 4px 14px rgba(20,227,227,.3);}
+.btn.red{background:linear-gradient(135deg,#ff8080,#c0392b);color:#fff;box-shadow:0 4px 14px rgba(192,57,43,.35);}
+.btn.sm{min-height:34px;padding:6px 11px;font-size:10px;}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px;}
+.hint{font-size:12px;opacity:.72;line-height:1.55;margin-top:8px;}
+.sep{height:1px;background:rgba(217,182,74,.2);margin:14px 0;}
+.status{font-size:13px;color:var(--cyan-l);min-height:16px;margin-top:8px;}
+
+/* toggle */
+.switch{position:relative;display:inline-block;width:56px;height:30px;flex:0 0 auto;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;inset:0;cursor:pointer;background:rgba(4,18,17,.9);border:1px solid rgba(217,182,74,.4);border-radius:30px;transition:.2s;}
+.slider::before{content:"";position:absolute;height:22px;width:22px;left:3px;top:3px;background:linear-gradient(135deg,#f0d98c,#d9b64a);border-radius:50%;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.4);}
+.switch input:checked + .slider{background:rgba(13,95,95,.8);border-color:var(--gold);}
+.switch input:checked + .slider::before{transform:translateX(26px);}
+.togglerow{display:flex;align-items:center;gap:12px;margin-top:12px;font-weight:600;font-size:14px;color:var(--cyan-l);min-height:44px;flex-wrap:wrap;}
+.togglerow input[type=checkbox]{accent-color:var(--gold);width:18px;height:18px;}
+
+/* duplicate banner */
+#dupBanner{
+  display:none;margin:0 0 14px;padding:12px 16px;border-radius:12px;
+  background:rgba(192,57,43,.15);border:1px solid rgba(255,107,107,.6);
+  color:#ffb3b3;font-weight:700;font-size:13px;letter-spacing:.5px;
+  align-items:center;gap:10px;
+}
+#dupBanner.show{display:flex;}
+#dupBanner i{color:#ff6b6b;}
+
+/* ============ TEAM EDITOR (with logo upload) ============ */
+.team-editor{display:flex;flex-direction:column;gap:6px;margin-top:6px;max-height:320px;overflow-y:auto;padding-right:4px;}
+.team-row2{display:grid;grid-template-columns:26px 1fr 46px 36px;gap:8px;align-items:center;}
+.team-row2.dup input[data-k=name]{border-color:#ff6b6b;box-shadow:0 0 0 3px rgba(255,107,107,.2);}
+.team-row2 .tno{font-size:10px;color:var(--gold-l);font-weight:800;text-align:center;letter-spacing:1px;}
+.team-row2 input{min-height:36px;font-size:13px;padding:7px 9px;}
+.team-row2 .tdel{min-height:36px;padding:0;display:flex;align-items:center;justify-content:center;color:#ff9b9b;border-color:rgba(255,107,107,.4);}
+.logo-cell{
+  width:46px;height:46px;border-radius:10px;cursor:pointer;position:relative;overflow:hidden;
+  border:1px dashed rgba(217,182,74,.6);background:rgba(4,18,17,.6);
+  display:flex;align-items:center;justify-content:center;transition:.15s;flex:0 0 auto;
+}
+.logo-cell:hover{border-color:var(--gold);box-shadow:0 0 10px rgba(217,182,74,.3);}
+.logo-cell.drag{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(20,227,227,.3);}
+.logo-cell img{width:100%;height:100%;object-fit:cover;}
+.logo-cell .plc{color:rgba(217,182,74,.7);font-size:15px;pointer-events:none;}
+.logo-cell .chg{
+  position:absolute;inset:auto 0 0 0;height:16px;font-size:8px;font-weight:800;letter-spacing:1px;
+  background:rgba(4,16,15,.85);color:var(--gold-l);display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:.15s;pointer-events:none;
+}
+.logo-cell:hover .chg{opacity:1;}
+
+/* records */
+.rec-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(217,182,74,.25);border-radius:10px;margin-top:8px;background:rgba(4,18,17,.5);flex-wrap:wrap;}
+.rec-info{flex:1;min-width:120px;display:flex;flex-direction:column;gap:2px;}
+.rec-info b{font-size:13px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rec-info span{font-size:10px;color:var(--cyan-l);opacity:.8;letter-spacing:1px;}
+.rec-row .btn{padding:6px 10px;min-height:32px;font-size:10px;}
+.rec-del{color:#ff9b9b !important;border-color:rgba(255,107,107,.4) !important;}
+
+/* ============ BRACKET STAGE ============ */
+#stagePanel{overflow-x:auto;}
+#bracketArea{
+  background:#ffffff;border-radius:14px;padding:28px 22px;position:relative;
+  box-shadow:0 10px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(217,182,74,.3);
+  min-height:420px;overflow-x:auto;
+}
+.bracket-title{text-align:center;font-family:'Orbitron',var(--ios-font);font-weight:900;color:var(--teal-800);font-size:clamp(16px,2vw,24px);letter-spacing:3px;margin-bottom:2px;}
+.bracket-sub{text-align:center;font-size:11px;letter-spacing:3px;color:var(--teal-700);font-weight:700;margin-bottom:22px;}
+.bracket-header{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px 16px 14px;margin:0 0 18px;
+  background:linear-gradient(135deg,#0d5f5f 0%,#0b3d3f 50%,#062b2d 100%);
+  border:2px solid var(--gold-d);border-radius:12px;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.bracket-header .bh-logo{height:62px;flex:0 0 auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));}
+.bracket-header .bh-text{flex:1;text-align:center;min-width:0;padding:0 8px;}
+.bh-toprow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+.bracket-header .bracket-title{color:#f0d98c;margin-bottom:0;text-shadow:0 1px 4px rgba(0,0,0,.45);text-align:left;}
+.bracket-header .bracket-sub{color:#9be8e4;margin-bottom:0;margin-top:4px;}
+.bh-meta{display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:8px;font-size:11px;letter-spacing:2px;font-weight:800;color:#e8f4f3;}
+.bh-meta span.mitem{display:inline-flex;align-items:center;gap:7px;}
+.bh-meta i{color:var(--gold-l);}
+
+/* final results block */
+.final-results{
+  margin:0 0 18px;padding:14px 16px;border:2px solid var(--gold);border-radius:12px;
+  background:#ffffff;
+}
+.fr-title{
+  font-family:'Orbitron',var(--ios-font);font-weight:900;font-size:13px;letter-spacing:4px;color:var(--teal-800);
+  text-align:center;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.fr-title i{color:var(--gold-d);}
+.fr-list{display:flex;flex-direction:row;gap:12px;align-items:stretch;justify-content:center;flex-wrap:wrap;}
+.fr-item{display:flex;align-items:center;gap:12px;width:min(31%,340px);max-width:340px;margin:0;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.6);border:1.5px solid rgba(13,95,95,.25);box-shadow:0 3px 10px rgba(0,0,0,.10);}
+
+.fr-item .fr-medal3d{flex:0 0 auto;}
+.fr-item .fr-medal3d svg{width:52px;height:78px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35));}
+.fr-item .fr-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.fr-rank{font-family:'Orbitron',var(--ios-font);font-weight:900;font-size:10px;letter-spacing:3px;color:var(--gold-d);}
+.fr-item .fr-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;color:var(--teal-800);text-align:left;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;line-height:1.2;}
+
+.fr-item .fr-rec{flex:0 0 auto;background:var(--teal-800);color:var(--gold-l);border-radius:8px;padding:4px 12px;font-size:12px;letter-spacing:2px;font-weight:800;min-width:64px;text-align:center;}
+
+.bracket{display:flex;align-items:stretch;gap:0;justify-content:center;min-width:max-content;padding-bottom:10px;position:relative;}
+.round{display:flex;flex-direction:column;justify-content:space-around;min-width:216px;position:relative;padding:32px 34px 0 10px;}
+.round-label{position:absolute;top:6px;left:0;right:0;text-align:center;font-family:'Orbitron',var(--ios-font);font-size:10px;letter-spacing:2px;color:var(--gold-d);font-weight:700;text-transform:uppercase;}
+.match-label{font-size:9px;letter-spacing:1px;color:var(--teal-700);font-weight:800;text-transform:uppercase;margin-bottom:5px;line-height:1.6;}
+.match-label i{color:var(--gold-d);margin-right:4px;}
+.mtime{font-size:8.5px;letter-spacing:1px;color:var(--gold-d);font-weight:700;text-transform:uppercase;margin:-2px 0 4px;white-space:nowrap;}
+.mtime i{margin-right:4px;}
+.match{display:flex;flex-direction:column;margin:14px 0;position:relative;}
+.slot{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  background:linear-gradient(135deg,var(--teal-800),var(--teal-700));
+  color:#fff;font-weight:600;font-size:13px;
+  padding:7px 8px;min-height:40px;width:212px;
+  border:1px solid rgba(217,182,74,.35);cursor:pointer;transition:.15s;
+  text-align:left;font-family:var(--ios-font);position:relative;
+}
+.slot:first-child{border-radius:9px 9px 0 0;border-bottom:none;}
+.slot:last-child{border-radius:0 0 9px 9px;}
+.slot .tlogo{width:24px;height:24px;flex:0 0 auto;border-radius:50%;object-fit:cover;background:#fff;border:1px solid rgba(217,182,74,.65);box-shadow:0 1px 3px rgba(0,0,0,.35);}
+.slot .tlogo.ph{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:10px;border-style:dashed;}
+.slot .nm{flex:1;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;line-height:1.3;}
+/* points: input in editor, text in export */
+.slot .score-inp{
+  width:36px;min-height:24px;height:24px;flex:0 0 auto;padding:2px 4px;font-size:12px;text-align:center;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);border-radius:6px;color:#fff;font-weight:800;
+}
+.slot .score-inp::placeholder{color:rgba(255,255,255,.4);}
+.score-txt{display:none;flex:0 0 auto;font-weight:900;font-size:13px;color:#f0d98c;background:rgba(4,16,15,.35);border-radius:6px;padding:1px 7px;min-width:26px;text-align:center;}
+.exporting .score-inp{display:none !important;}
+.exporting .score-txt.has-val{display:inline-block;}
+.exporting .slot.empty{display:flex;}
+.exporting .slot.addteam-gap{display:none !important;}
+.exporting .dq-btn{display:none !important;}
+.exporting .conn{box-shadow:none !important;}
+.exporting .champ-trophy{filter:none !important;}
+.exporting .fr-medal3d svg{filter:none !important;}
+.exporting .bracket-header{box-shadow:none !important;}
+.exporting .doc-header{box-shadow:none !important;}
+.exporting .fr-item{box-shadow:none !important;}
+.exporting .lg-circle{box-shadow:none !important;}
+.exporting .slot{box-shadow:none !important;}
+/* ===== EXPORT SANITIZER: white bg, teal header, zero gold shadows ===== */
+.exporting{background:#ffffff !important;box-shadow:none !important;filter:none !important;text-shadow:none !important;}
+.exporting *{box-shadow:none !important;filter:none !important;text-shadow:none !important;}
+.exporting img{filter:none !important;}
+.exporting svg{filter:none !important;}
+.exporting .conn{box-shadow:none !important;}
+.exporting::before,.exporting::after{display:none !important;}
+.exporting .bracket-header,.exporting .doc-header,.exporting .cert-hdr{
+  background:linear-gradient(135deg,#0d5f5f 0%,#0b3d3f 50%,#062b2d 100%) !important;
+  border-color:#0b3d3f !important;}
+.exporting .dh-title,.exporting .bracket-title{color:#f0d98c !important;}
+.exporting .ms-ic{display:none !important;}
+.exporting .slot.winner{background:linear-gradient(135deg,var(--gold-l),var(--gold));color:#04100f;border-color:var(--gold-d);box-shadow:none;}
+.exporting .slot.winner .score-txt.has-val{color:#04100f;background:rgba(4,16,15,.12);}
+.slot.winner{background:linear-gradient(135deg,var(--gold-l),var(--gold));color:#04100f;border-color:var(--gold-d);box-shadow:0 0 14px rgba(217,182,74,.45);}
+.slot.winner::after{content:"\2605";font-weight:900;font-size:13px;color:#04100f;line-height:1;flex:0 0 auto;}
+.slot.winner .score-inp{background:rgba(4,16,15,.15);border-color:rgba(4,16,15,.4);color:#04100f;}
+.slot.winner .score-txt.has-val{color:#04100f;background:rgba(4,16,15,.12);}
+.slot.empty{opacity:.55;cursor:default;font-style:italic;}
+.slot:hover:not(.empty){filter:brightness(1.15);}
+.slot .dq-btn{flex:0 0 auto;width:26px;height:22px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.45);background:rgba(0,0,0,.25);color:#ffd0d0;font-size:8px;font-weight:900;letter-spacing:.5px;opacity:.35;transition:.15s;line-height:1;padding:0;font-family:var(--ios-font);}
+.slot .dq-btn:hover{opacity:1;background:rgba(160,30,30,.85);}
+.slot.dq{background:linear-gradient(135deg,#6b1d1d,#932f2f);color:#ffd6d6;border-color:#c04b4b;}
+.slot.dq .nm{text-decoration:line-through;}
+.slot.dq::before{content:"DQ";position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:#c0392b;color:#fff;font-size:8px;font-weight:900;letter-spacing:1px;padding:1px 7px;border-radius:8px;border:1px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:2;}
+.slot.dq .dq-btn{opacity:1;background:#c0392b;color:#fff;border-color:#ffb3b3;}
+.slot.dq.winner{box-shadow:none;}
+
+.conn{position:absolute;pointer-events:none;}
+.conn-h{height:2px;background:var(--gold-d);border-radius:2px;box-shadow:0 1px 1px rgba(0,0,0,.25);}
+.conn-v{width:2px;background:var(--gold-d);border-radius:2px;box-shadow:1px 0 1px rgba(0,0,0,.25);}
+
+/* match schedule pickers (calendar / clock inside bracket) */
+.ms-ic{width:20px;height:20px;flex:0 0 auto;border-radius:6px;border:1px solid rgba(13,95,95,.45);background:rgba(13,95,95,.10);color:var(--teal-700);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:9px;padding:0;transition:.15s;line-height:1;}
+.ms-ic:hover{background:var(--teal-700);color:#fff;border-color:var(--teal-700);}
+.ms-txt{font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--teal-700);text-transform:uppercase;white-space:nowrap;}
+.ms-inp{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0;margin:0;}
+/* horizontal final results: 3rd box = semi-finalists */
+.fr-semi-box{flex-direction:column;align-items:stretch;gap:8px;}
+.fr-semi-box > .fr-info{width:100%;}
+.fr-semi-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:1px solid rgba(13,95,95,.25);border-radius:10px;background:rgba(255,255,255,.55);}
+.fr-semi-row .fr-medal3d svg{width:24px;height:36px;}
+.fr-semi-name{flex:1;min-width:0;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;color:var(--teal-800);text-align:left;word-break:break-word;line-height:1.2;}
+@media(max-width:900px){.fr-item{width:100%;max-width:440px;}}
+
+.champ-box{margin:auto;text-align:center;background:transparent;border:none;border-radius:14px;padding:20px 22px;box-shadow:none;}
+.champ-box .lbl{font-size:10px;letter-spacing:3px;color:var(--gold-l);font-weight:800;margin-bottom:8px;}
+.champ-trophy{width:168px;height:auto;display:block;margin:0 auto;filter:drop-shadow(0 5px 12px rgba(0,0,0,.45));}
+
+.bracket-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-top:18px;}
+.bf-qr{display:flex;flex-direction:row;align-items:flex-start;gap:10px;}
+.bf-qr-col{display:flex;flex-direction:column;align-items:center;gap:5px;width:84px;flex:0 0 auto;}
+.bf-qr-right{width:auto;flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;gap:5px;min-height:84px;}
+.sp-by{font-size:8px;letter-spacing:1.5px;color:var(--teal-700);font-weight:800;line-height:1.3;}
+.sp-name{font-family:'Orbitron',var(--ios-font);font-weight:700;color:var(--teal-800);letter-spacing:1.5px;font-size:10px;text-align:center;}
+.sp-sponsor{font-family:'Orbitron',var(--ios-font);font-weight:700;color:var(--teal-800);letter-spacing:1px;font-size:10px;word-break:break-word;line-height:1.35;}
+.bracket-footer .bf-logo{height:84px;width:auto;filter:drop-shadow(0 2px 5px rgba(0,0,0,.3));}
+
+/* ============ GENERIC DOC FRAME (rules / standing / certs / banner / logos) ============ */
+.doc-wrap{overflow-x:auto;padding:4px;}
+.doc{
+  background:#ffffff;border-radius:14px;position:relative;color:var(--teal-800);
+  box-shadow:0 10px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(217,182,74,.3);
+  padding:26px 22px;min-width:320px;
+}
+.doc-header{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:12px 16px;margin:0 0 18px;position:relative;
+  background:linear-gradient(135deg,#0d5f5f 0%,#0b3d3f 50%,#062b2d 100%);
+  border:2px solid var(--gold-d);border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.doc-header img.dh-logo{height:56px;flex:0 0 auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));}
+.doc-header .dh-center{flex:1;text-align:center;min-width:0;}
+.doc-header .dh-title{font-family:'Orbitron',var(--ios-font);font-weight:900;color:#f0d98c;font-size:clamp(13px,1.8vw,20px);letter-spacing:3px;text-shadow:0 1px 4px rgba(0,0,0,.45);}
+.doc-header .dh-sub{color:#9be8e4;font-size:10px;letter-spacing:3px;font-weight:700;margin-top:4px;}
+.doc-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-top:18px;position:relative;}
+.doc-footer .df-left{display:flex;align-items:flex-start;gap:10px;}
+.doc-footer .df-qrbox{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.doc-footer .df-sptxt{display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:84px;}
+.doc-footer img.df-logo{height:76px;width:auto;filter:drop-shadow(0 2px 5px rgba(0,0,0,.3));}
+.doc-body{position:relative;}
+
+/* rules */
+.rules-list{counter-reset:rule;max-width:760px;margin:0 auto;}
+.rules-list .rule-item{
+  counter-increment:rule;display:flex;gap:14px;align-items:flex-start;
+  padding:11px 6px;border-bottom:1px solid rgba(13,95,95,.15);font-size:14px;line-height:1.6;font-weight:600;color:#123c3e;
+}
+.rules-list .rule-item::before{
+  content:counter(rule,decimal-leading-zero);flex:0 0 auto;font-family:'Orbitron',sans-serif;font-weight:900;
+  color:var(--gold-d);font-size:15px;letter-spacing:1px;
+}
+
+/* standing */
+.stand-table{width:100%;border-collapse:collapse;max-width:820px;margin:0 auto;}
+.stand-table th{
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:#f0d98c;
+  background:linear-gradient(135deg,var(--teal-700),var(--teal-900));padding:10px 8px;text-align:left;
+}
+.stand-table th:first-child{border-radius:10px 0 0 0;text-align:center;width:56px;}
+.stand-table th:last-child{border-radius:0 10px 0 0;}
+.stand-table td{padding:7px 8px;border-bottom:1px solid rgba(13,95,95,.15);font-size:14px;font-weight:600;color:#123c3e;vertical-align:middle;}
+.stand-table td.st-rank{text-align:center;font-family:'Orbitron',sans-serif;font-weight:900;color:var(--gold-d);}
+.stand-table .w{color:#0d7a3f;font-weight:900;}
+.stand-table .l{color:#c0392b;font-weight:900;}
+.stand-org{text-align:center;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--teal-700);margin:14px 0 4px;font-weight:800;}
+
+/* certificates */
+.cert{
+  width:100%;max-width:1000px;margin:0 auto;aspect-ratio:1000/707;position:relative;
+  background:#ffffff;
+  border:3px solid var(--gold-d);border-radius:16px;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.cert-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 40px;position:relative;}
+.cert-award{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(20px,3.4vw,38px);letter-spacing:6px;color:var(--teal-800);}
+.cert-award .medal-i{font-size:clamp(24px,3.6vw,42px);display:block;margin-bottom:6px;}
+.cert-presented{font-size:12px;letter-spacing:4px;color:var(--teal-700);font-weight:700;margin:14px 0 4px;}
+.cert-name{
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(22px,4vw,44px);letter-spacing:3px;
+  color:var(--gold-d);border-bottom:3px solid var(--gold);padding:0 30px 6px;margin:4px 0 14px;max-width:90%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.cert-desc{font-size:clamp(11px,1.4vw,15px);color:#2a5557;font-weight:600;max-width:640px;line-height:1.7;}
+.cert-tourn{font-family:'Orbitron',sans-serif;font-weight:700;color:var(--teal-800);letter-spacing:2px;font-size:clamp(12px,1.6vw,17px);margin-top:12px;}
+.cert-sign{display:flex;justify-content:space-between;width:100%;max-width:760px;margin-top:auto;padding:0 10px 6px;}
+.cert-sign .sig{text-align:center;font-size:11px;color:var(--teal-700);font-weight:700;letter-spacing:1px;}
+.cert-sign .sig .line{width:170px;border-top:2px solid var(--teal-800);margin:0 auto 6px;}
+.cert-medal-gold .medal-i,.cert-medal-gold .cert-award{color:#c9a227;}
+.cert-medal-silver .medal-i,.cert-medal-silver .cert-award{color:#8a959d;}
+.cert-medal-bronze .medal-i,.cert-medal-bronze .cert-award{color:#a06a3b;}
+.cert-medal-part .medal-i,.cert-medal-part .cert-award{color:var(--teal-700);}
+
+/* banner */
+.banner{
+  width:100%;max-width:1200px;margin:0 auto;aspect-ratio:16/9;position:relative;overflow:hidden;
+  border:3px solid var(--gold-d);border-radius:16px;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(217,182,74,.25), transparent 55%),
+    radial-gradient(700px 500px at -5% 110%, rgba(20,227,227,.18), transparent 55%),
+    linear-gradient(150deg,#0d5f5f 0%,#0b3d3f 50%,#04100f 100%);
+  display:flex;flex-direction:column;
+}
+.banner-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;color:#fff;}
+.banner-tag{font-size:11px;letter-spacing:5px;font-weight:800;color:var(--cyan-l);border:1px solid rgba(155,232,228,.5);padding:5px 16px;border-radius:20px;background:rgba(4,16,15,.35);}
+.banner-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(22px,4.6vw,52px);letter-spacing:4px;color:#f0d98c;text-shadow:0 4px 18px rgba(0,0,0,.5);margin:12px 0 6px;line-height:1.15;}
+.banner-sub{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(13px,2vw,22px);letter-spacing:3px;color:#9be8e4;}
+.banner-meta{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:16px;font-size:clamp(10px,1.4vw,14px);letter-spacing:2px;font-weight:800;color:#e8f4f3;}
+.banner-meta span{display:inline-flex;align-items:center;gap:8px;}
+.banner-meta i{color:var(--gold-l);}
+.banner-prize{margin-top:12px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(14px,2.4vw,28px);letter-spacing:3px;color:var(--gold-l);text-shadow:0 3px 12px rgba(0,0,0,.5);}
+.banner-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;position:relative;z-index:2;}
+.banner-hdr img{height:64px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.45));}
+.banner-ftr{display:flex;align-items:flex-end;justify-content:space-between;padding:14px 20px;position:relative;z-index:2;}
+.banner-ftr .bf-q{display:flex;align-items:flex-start;gap:10px;}
+.banner-ftr .bf-qcol{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.banner-ftr .bf-txt{font-size:9px;letter-spacing:2px;font-weight:800;color:#9be8e4;line-height:1.5;}
+
+/* logos collage */
+.logos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:16px;max-width:900px;margin:0 auto;}
+.logos-grid .lg-cell{display:flex;flex-direction:column;align-items:center;gap:7px;}
+.logos-grid .lg-circle{
+  width:84px;height:84px;border-radius:50%;object-fit:cover;background:#fff;
+  border:3px solid var(--gold-d);box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+.logos-grid .lg-name{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--teal-800);text-align:center;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.logos-count{text-align:center;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--teal-700);font-weight:800;margin-bottom:14px;}
+
+/* ============ HUB / DASHBOARD ============ */
+.hub-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.hub-tabs button{
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;font-weight:700;cursor:pointer;
+  color:var(--cyan-l);background:rgba(13,95,95,.25);border:1px solid rgba(217,182,74,.3);
+  border-radius:20px;padding:8px 14px;transition:.15s;min-height:36px;display:inline-flex;align-items:center;gap:7px;
+}
+.hub-tabs button i{color:var(--gold-l);}
+.hub-tabs button.on{background:linear-gradient(135deg,#f0d98c,#d9b64a);color:#04100f;border-color:var(--gold);}
+.hub-tabs button.on i{color:#04100f;}
+.hub-count{font-size:10px;background:rgba(4,16,15,.5);border-radius:12px;padding:1px 8px;}
+.chip{font-size:9px;letter-spacing:2px;font-weight:900;padding:4px 10px;border-radius:14px;text-transform:uppercase;white-space:nowrap;}
+.chip.upcoming{background:rgba(20,227,227,.15);color:#14e3e3;border:1px solid rgba(20,227,227,.5);}
+.chip.ongoing{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.5);}
+.chip.pending{background:rgba(255,184,0,.15);color:#ffb800;border:1px solid rgba(255,184,0,.5);}
+.chip.completed{background:rgba(217,182,74,.15);color:#f0d98c;border:1px solid rgba(217,182,74,.5);}
+.hub-empty{padding:22px;text-align:center;color:var(--cyan-l);opacity:.75;font-size:13px;border:1px dashed rgba(217,182,74,.35);border-radius:12px;margin-top:10px;}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px;}
+.stat-card{background:rgba(4,18,17,.55);border:1px solid rgba(217,182,74,.3);border-radius:12px;padding:12px 14px;text-align:center;}
+.stat-card b{display:block;font-family:'Orbitron',sans-serif;font-size:22px;color:var(--gold-l);}
+.stat-card span{font-size:9px;letter-spacing:2px;color:var(--cyan-l);font-weight:800;}
+.fb-status{font-size:11px;letter-spacing:1px;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:6px;}
+.fb-status.ok{color:#4ade80;}
+.fb-status.off{color:#ffb800;}
+
+:focus-visible{outline:2px solid var(--gold-l);outline-offset:3px;}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+@media(max-width:640px){
+  header{padding:14px;}
+  main{padding:14px 10px 40px;}
+  nav.tabs{padding:8px 8px;}
+  nav.tabs button{padding:8px 10px;font-size:9px;}
+  .team-row2{grid-template-columns:24px 1fr 42px 32px;}
+  .logo-cell{width:42px;height:42px;}
+  .slot{width:190px;font-size:12px;}
+  .round{min-width:204px;}
+}
+
+/* ============ UPGRADES: drag reorder, 3D medals, premium cert ============ */
+.team-row2.dragging{opacity:.35;}
+.team-row2.dragover{outline:2px dashed var(--gold);outline-offset:3px;border-radius:8px;}
+.rules-list .rule-item .ricon{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#f0d98c,#d9b64a 60%,#a8873a);display:inline-flex;align-items:center;justify-content:center;color:#04100f;font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.5);}
+.fr-medal3d{display:inline-flex;align-items:center;flex:0 0 auto;}
+.doc-footer img.df-logo{height:80px;}
+.cert-hdr{display:flex;align-items:center;justify-content:center;padding:12px 20px;position:relative;z-index:2;background:linear-gradient(135deg,#0d5f5f 0%,#0b3d3f 50%,#062b2d 100%);border-bottom:3px solid var(--gold-d);}
+.cert-hdr img{height:72px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.45));}
+.cert-goldline{height:4px;margin:8px 28px 0;border-radius:3px;background:linear-gradient(90deg,transparent,#a8873a 12%,#f9e7a8 50%,#a8873a 88%,transparent);box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.cert-sigrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:6px 34px 4px;position:relative;z-index:2;margin-top:auto;}
+.cert-sigrow .sig-date{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:var(--teal-700);padding-bottom:10px;}
+.cert-sigrow .sig-mid{display:flex;flex-direction:column;align-items:center;}
+.cert-sigrow .sig-mid img{height:66px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.3));}
+.sig-script{font-family:'Brush Script MT','Segoe Script','Snell Roundhand','Lucida Handwriting',cursive;font-size:32px;color:var(--teal-800);line-height:1;padding:0 8px 2px;}
+.sig-underline{width:190px;border-top:2px solid var(--teal-800);margin:0 auto 5px;}
+.sig-cap{font-size:9px;letter-spacing:2px;font-weight:800;color:var(--teal-700);text-align:center;}
+.cert-ftr{display:flex;align-items:center;gap:12px;padding:8px 24px 14px;position:relative;z-index:2;}
+</style>
+</head>
+<body>
+
+<!-- ================= SITE HEADER ================= -->
+<header>
+  <div class="hdr-inner">
+    <img class="logo-main" src="https://i.imgur.com/gpTrmMn.png" alt="DGC" crossorigin="anonymous">
+    <div class="hdr-text">
+      <h1>DGC TOURNAMENT HUB <span class="live-dot" id="liveDot"><i class="fa-solid fa-circle"></i> LIVE OFF</span></h1>
+      <div class="hdr-sub">DGC ESPORTS · BRACKET · RULES · STANDING · CERTIFICATES · BANNER</div>
+    </div>
+    <span class="hdr-badge"><i class="fa-solid fa-trophy"></i> DGC OFFICIAL</span>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<nav class="tabs" id="mainNav">
+  <button class="active" data-view="view-bracket"><i class="fa-solid fa-diagram-project"></i> BRACKET</button>
+  <button data-view="view-rules"><i class="fa-solid fa-scroll"></i> RULES</button>
+  <button data-view="view-standing"><i class="fa-solid fa-ranking-star"></i> STANDING</button>
+  <button data-view="view-certs"><i class="fa-solid fa-certificate"></i> CERTIFICATES</button>
+  <button data-view="view-banner"><i class="fa-solid fa-image"></i> BANNER</button>
+  <button data-view="view-logos"><i class="fa-solid fa-circle-notch"></i> TEAM LOGOS</button>
+  <button data-view="view-hub"><i class="fa-solid fa-table-columns"></i> TOURNAMENTS</button>
+</nav>
+
+<main>
+<!-- ============================================================ -->
+<!-- ======================= VIEW: BRACKET ====================== -->
+<!-- ============================================================ -->
+<div class="view active" id="view-bracket">
+<div id="dupBanner"><i class="fa-solid fa-triangle-exclamation"></i><span id="dupText"></span></div>
+<div style="display:grid;grid-template-columns:minmax(340px,430px) 1fr;gap:24px;align-items:start;" id="bracketLayout">
+  <section>
+    <div class="panel">
+      <h2><i class="fa-solid fa-gears"></i> 01 · BRACKET SETUP</h2>
+      <label class="f" for="tName">TOURNAMENT NAME</label>
+      <input type="text" id="tName" value="DGC QUICK CUP — SEASON 1" oninput="render(true)">
+      <div class="grid2">
+        <div>
+          <label class="f" for="tFormat">FORMAT</label>
+          <select id="tFormat" onchange="buildBracket()">
+            <option value="single-4">SINGLE ELIMINATION · 4 TEAMS</option>
+            <option value="single-8" selected>SINGLE ELIMINATION · 8 TEAMS</option>
+            <option value="single-16">SINGLE ELIMINATION · 16 TEAMS</option>
+            <option value="single-32">SINGLE ELIMINATION · 32 TEAMS</option>
+            <option value="single-64">SINGLE ELIMINATION · 64 TEAMS</option>
+            <option value="double-4">DOUBLE ELIMINATION · 4 TEAMS</option>
+            <option value="double-8">DOUBLE ELIMINATION · 8 TEAMS</option>
+            <option value="double-16">DOUBLE ELIMINATION · 16 TEAMS</option>
+            <option value="double-32">DOUBLE ELIMINATION · 32 TEAMS</option>
+            <option value="double-64">DOUBLE ELIMINATION · 64 TEAMS</option>
+          </select>
+        </div>
+        <div>
+          <label class="f" for="sponsorName">SPONSOR NAME</label>
+          <input type="text" id="sponsorName" value="DGC eSTORE" oninput="renderSponsor()">
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <label class="f" for="evDate"><i class="fa-solid fa-calendar"></i> EVENT DAY (OPTIONAL)</label>
+          <input type="text" id="evDate" placeholder="e.g. NOVEMBER 1" oninput="render(true)">
+        </div>
+        <div>
+          <label class="f" for="evTime"><i class="fa-solid fa-clock"></i> EVENT TIME (OPTIONAL)</label>
+          <input type="text" id="evTime" placeholder="e.g. 00:00 AM" oninput="render(true)">
+        </div>
+      </div>
+      <label class="togglerow" style="cursor:pointer"><input type="checkbox" id="showDateTime" onchange="render(true)"> SHOW DAY &amp; TIME UNDER TOURNAMENT TITLE</label>
+      <label class="f" for="timesBox">MATCH SCHEDULE (OPTIONAL — ONE PER LINE)</label>
+      <textarea id="timesBox" style="min-height:70px" placeholder="e.g.&#10;November 3 | 8pm&#10;November 3 | 9pm&#10;Leave blank = no schedule shown."></textarea>
+      <label class="f" for="teamsBox">TEAM NAMES (ONE PER LINE)</label>
+      <textarea id="teamsBox" placeholder="Team names, one per line..." oninput="teamsBoxChanged()"></textarea>
+      <div class="hint">Team logos are uploaded per team in the TEAM EDITOR below — click the logo box or drag &amp; drop an image. No logo = default DGC logo.</div>
+      <div class="btnrow">
+        <button class="btn" id="buildBtn" onclick="buildBracket()"><i class="fa-solid fa-diagram-project"></i> GENERATE BRACKET</button>
+        <button class="btn ghost" onclick="fillSample()">SAMPLE TEAMS</button>
+        <button class="btn ghost" onclick="resetBracket()">RESET</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2><i class="fa-solid fa-users-gear"></i> 02 · TEAM EDITOR</h2>
+      <div class="hint" style="margin-top:0">Edit names, <b>click or drag &amp; drop a logo image</b> per team, remove or add teams — updates instantly.</div>
+      <div class="team-editor" id="teamEditor"></div>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="addTeam()"><i class="fa-solid fa-plus"></i> ADD TEAM</button>
+        <button class="btn ghost" onclick="shuffleTeams()"><i class="fa-solid fa-shuffle"></i> SHUFFLE SEEDS</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2><i class="fa-solid fa-handshake"></i> 03 · SPONSOR QR</h2>
+      <label class="f" for="sponsorUrl">SPONSOR LINK (FOR QR CODE)</label>
+      <input type="text" id="sponsorUrl" value="https://m.me/dgcestore" oninput="renderSponsor()">
+      <div class="btnrow">
+        <button class="btn ghost" onclick="document.getElementById('sponsorUrl').value='https://m.me/dgcestore';renderSponsor()">DGC eSTORE LINK</button>
+      </div>
+      <label class="togglerow" style="cursor:pointer"><input type="checkbox" id="showSponsor" checked onchange="renderSponsor()"> SHOW SPONSOR QR (BOTTOM-LEFT OF BRACKET)</label>
+    </div>
+
+    <div class="panel">
+      <h2><i class="fa-solid fa-tower-broadcast"></i> 04 · LIVE PREVIEW</h2>
+      <div class="togglerow">
+        <label class="switch"><input type="checkbox" id="liveToggle" onchange="toggleLive()"><span class="slider"></span></label>
+        <span>LIVE PREVIEW — SHOW TO OTHER TEAMS</span>
+      </div>
+      <div class="hint">When ON, every change is broadcast in real time. Share the live link below so other teams can watch the bracket update live.</div>
+      <div class="btnrow">
+        <button class="btn teal" onclick="copyLiveLink()"><i class="fa-solid fa-link"></i> COPY LIVE LINK</button>
+        <button class="btn ghost" onclick="downloadBracket()"><i class="fa-solid fa-image"></i> DOWNLOAD BRACKET (PNG)</button>
+        <button class="btn ghost" onclick="downloadBracketJpg()"><i class="fa-solid fa-file-image"></i> DOWNLOAD (JPG)</button>
+        <button class="btn teal" onclick="copyBracketImage()"><i class="fa-solid fa-copy"></i> COPY PICTURE (MESSENGER)</button>
+      </div>
+      <div class="status" id="liveStatus"></div>
+    </div>
+
+    <div class="panel">
+      <h2><i class="fa-solid fa-box-archive"></i> 05 · TOURNAMENT RECORDS (THIS DEVICE)</h2>
+      <div class="hint" style="margin-top:0">Saved brackets stay here permanently (unless deleted). For access on ANY device, use the TOURNAMENTS tab (Firebase).</div>
+      <label class="f" for="recName">RECORD NAME (OPTIONAL)</label>
+      <input type="text" id="recName" placeholder="e.g. DGC Quick Cup Finals">
+      <div class="btnrow">
+        <button class="btn" onclick="saveRecord()"><i class="fa-solid fa-floppy-disk"></i> SAVE CURRENT</button>
+      </div>
+      <div id="recList"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="stagePanel">
+    <h2><i class="fa-solid fa-eye"></i> 06 · BRACKET PREVIEW</h2>
+    <div class="hint" style="margin-top:-6px;margin-bottom:12px;"><i class="fa-solid fa-hand-pointer"></i> Double-click a team name to rename · drag teams onto each other (or from the editor) to swap seeds · hover MATCH for clear · hover a team for remove options · click a slot to mark the winner · type points directly.</div>
+    <div id="bracketArea">
+      <div class="bracket-header">
+        <img class="bh-logo" src="https://i.imgur.com/gpTrmMn.png" alt="DGC" crossorigin="anonymous">
+        <div class="bh-text">
+          <div class="bh-toprow">
+            <div class="bracket-title" id="bTitle">DGC QUICK CUP — SEASON 1</div>
+          </div>
+          <div class="bracket-sub">OFFICIAL DGC ESPORTS TOURNAMENT BRACKET</div>
+          <div class="bh-meta" id="bhMeta" style="display:none">
+            <span class="mitem" id="mDate" style="display:none"><i class="fa-solid fa-calendar"></i><span id="mDateTxt"></span></span>
+            <span class="mitem" id="mTime" style="display:none"><i class="fa-solid fa-clock"></i><span id="mTimeTxt"></span></span>
+          </div>
+        </div>
+      </div>
+      <div class="final-results" id="finalResults" style="display:none"></div>
+      <div class="bracket" id="bracket"></div>
+      <div class="bracket-footer">
+        <div class="bf-qr" id="bfQrWrap" style="display:none">
+          <div class="bf-qr-col">
+            <div id="sponsorQr"></div>
+          </div>
+          <div class="bf-qr-right">
+            <span class="sp-by">SPONSORED BY:</span>
+            <span class="sp-sponsor" id="spSponsor">DGC eSTORE</span>
+          </div>
+        </div>
+        <img class="bf-logo" src="https://i.imgur.com/jiS3Xh7.png" alt="" crossorigin="anonymous">
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ======================= VIEW: RULES ======================== -->
+<!-- ============================================================ -->
+<div class="view" id="view-rules">
+  <div style="display:grid;grid-template-columns:minmax(320px,400px) 1fr;gap:24px;align-items:start;" class="gen-layout">
+    <section class="panel">
+      <h2><i class="fa-solid fa-scroll"></i> RULES GENERATOR</h2>
+      <label class="f" for="rulesTitle">RULES TITLE</label>
+      <input type="text" id="rulesTitle" value="OFFICIAL TOURNAMENT RULES" oninput="renderRules()">
+      <label class="f" for="rulesSub">SUBTITLE (OPTIONAL)</label>
+      <input type="text" id="rulesSub" placeholder="e.g. DGC QUICK CUP — SEASON 1" oninput="renderRules()">
+      <label class="f" for="rulesBox">RULES (ONE PER LINE)</label>
+      <textarea id="rulesBox" style="min-height:260px" placeholder="1. All participants must...&#10;2. Match format is..." oninput="renderRules()"></textarea>
+      <div class="hint">Uses the same premium DGC header (imgur logos + QR + DGC eSTORE). Blank lines are skipped.</div>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="fillSampleRules()"><i class="fa-solid fa-wand-magic-sparkles"></i> SAMPLE RULES</button>
+        <button class="btn ghost" onclick="downloadDocPNG('rulesDoc','rules')"><i class="fa-solid fa-image"></i> PNG</button>
+        <button class="btn ghost" onclick="downloadDocJPG('rulesDoc','rules')"><i class="fa-solid fa-file-image"></i> JPG</button>
+        <button class="btn teal" onclick="copyDocImage('rulesDoc')"><i class="fa-solid fa-copy"></i> COPY</button>
+      </div>
+      <div class="status" id="rulesStatus"></div>
+    </section>
+    <section class="panel">
+      <h2><i class="fa-solid fa-eye"></i> RULES PREVIEW</h2>
+      <div class="doc-wrap"><div class="doc" id="rulesDoc"></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ====================== VIEW: STANDING ====================== -->
+<!-- ============================================================ -->
+<div class="view" id="view-standing">
+  <div style="display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:24px;align-items:start;" class="gen-layout">
+    <section class="panel">
+      <h2><i class="fa-solid fa-ranking-star"></i> STANDING BUILDER</h2>
+      <label class="f" for="standTitle">STANDING TITLE</label>
+      <input type="text" id="standTitle" value="OFFICIAL STANDING" oninput="renderStanding()">
+      <label class="f" for="standOrg">ORGANIZER</label>
+      <input type="text" id="standOrg" value="DexterousGC" oninput="renderStanding()">
+      <label class="f" for="standNames">PARTICIPANT NAMES (ONE PER LINE — TOP TO BOTTOM = RANK ORDER)</label>
+      <textarea id="standNames" style="min-height:200px" placeholder="DGC | CRONUS&#10;DSUV&#10;DGC | HERACLES" oninput="standNamesChanged()"></textarea>
+      <label class="f" for="standHist">MATCH HISTORY (ONE PER LINE — W / L / – SEPARATED BY SPACES)</label>
+      <textarea id="standHist" style="min-height:160px" placeholder="W W W W W&#10;W W W W L&#10;W W W L" oninput="renderStanding()"></textarea>
+      <div class="hint">Tip: <b>AUTO-FILL FROM BRACKET</b> builds the standing from the current bracket winners, losers &amp; match history.</div>
+      <div class="btnrow">
+        <button class="btn" onclick="autoFillStanding()"><i class="fa-solid fa-wand-magic-sparkles"></i> AUTO-FILL FROM BRACKET</button>
+        <button class="btn ghost" onclick="fillSampleStanding()"><i class="fa-solid fa-users"></i> SAMPLE</button>
+        <button class="btn ghost" onclick="downloadDocPNG('standingDoc','standing')"><i class="fa-solid fa-image"></i> PNG</button>
+        <button class="btn ghost" onclick="downloadDocJPG('standingDoc','standing')"><i class="fa-solid fa-file-image"></i> JPG</button>
+        <button class="btn teal" onclick="copyDocImage('standingDoc')"><i class="fa-solid fa-copy"></i> COPY</button>
+      </div>
+      <div class="status" id="standStatus"></div>
+    </section>
+    <section class="panel">
+      <h2><i class="fa-solid fa-eye"></i> STANDING PREVIEW</h2>
+      <div class="doc-wrap"><div class="doc" id="standingDoc"></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ====================== VIEW: CERTIFICATES ================== -->
+<!-- ============================================================ -->
+<div class="view" id="view-certs">
+  <div style="display:grid;grid-template-columns:minmax(320px,400px) 1fr;gap:24px;align-items:start;" class="gen-layout">
+    <section class="panel">
+      <h2><i class="fa-solid fa-certificate"></i> CERTIFICATE GENERATOR</h2>
+      <label class="f" for="certType">AWARD</label>
+      <select id="certType" onchange="certTypeChanged()">
+        <option value="champion">CHAMPION — GOLD MEDAL</option>
+        <option value="second">2ND PLACE — SILVER MEDAL</option>
+        <option value="semi">SEMI-FINALIST — BRONZE MEDAL</option>
+        <option value="participant">PARTICIPANT</option>
+      </select>
+      <div class="btnrow" style="margin-top:12px">
+        <button class="btn" onclick="certAutoFill()"><i class="fa-solid fa-wand-magic-sparkles"></i> AUTO-FILL FROM TOURNAMENT</button>
+      </div>
+      <label class="f" for="certNames">RECIPIENT NAMES (ONE PER LINE)</label>
+      <textarea id="certNames" style="min-height:130px" placeholder="DGC | CRONUS&#10;DSUV" oninput="certNamesChanged()"></textarea>
+      <label class="f" for="certTourn">TOURNAMENT NAME</label>
+      <input type="text" id="certTourn" value="DGC QUICK CUP — SEASON 1" oninput="renderCert()">
+      <label class="f" for="certDate">DATE (OPTIONAL)</label>
+      <input type="text" id="certDate" placeholder="e.g. NOVEMBER 1, 2026" oninput="renderCert()">
+      <label class="f" for="certOrg">ORGANIZER</label>
+      <input type="text" id="certOrg" value="Reinayanne" oninput="renderCert()">
+      <div class="hint">Preview shows one certificate at a time — use the arrows to browse. Download or copy each one for Messenger.</div>
+      <div class="btnrow">
+        <button class="btn ghost" id="certPrevBtn" onclick="certNav(-1)"><i class="fa-solid fa-chevron-left"></i> PREV</button>
+        <span class="btn ghost" style="cursor:default" id="certCounter">1 / 1</span>
+        <button class="btn ghost" onclick="certNav(1)">NEXT <i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <div class="btnrow">
+        <button class="btn" onclick="downloadCert()"><i class="fa-solid fa-image"></i> DOWNLOAD THIS (PNG)</button>
+        <button class="btn teal" onclick="copyCert()"><i class="fa-solid fa-copy"></i> COPY THIS</button>
+        <button class="btn ghost" onclick="downloadAllCerts()"><i class="fa-solid fa-layer-group"></i> DOWNLOAD ALL</button>
+      </div>
+      <div class="status" id="certStatus"></div>
+    </section>
+    <section class="panel">
+      <h2><i class="fa-solid fa-eye"></i> CERTIFICATE PREVIEW</h2>
+      <div class="doc-wrap"><div class="doc" style="background:transparent;box-shadow:none;padding:0;overflow:visible;" id="certDocWrap"><div class="cert" id="certDoc"></div></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ======================= VIEW: BANNER ======================= -->
+<!-- ============================================================ -->
+<div class="view" id="view-banner">
+  <div style="display:grid;grid-template-columns:minmax(320px,400px) 1fr;gap:24px;align-items:start;" class="gen-layout">
+    <section class="panel">
+      <h2><i class="fa-solid fa-image"></i> BANNER GENERATOR</h2>
+      <label class="f" for="banTag">TAG LINE (OPTIONAL)</label>
+      <input type="text" id="banTag" value="OFFICIAL ESPORTS TOURNAMENT" oninput="renderBanner()">
+      <label class="f" for="banTitle">BANNER TITLE</label>
+      <input type="text" id="banTitle" value="DGC QUICK CUP — SEASON 1" oninput="renderBanner()">
+      <label class="f" for="banSub">SUBTITLE (OPTIONAL)</label>
+      <input type="text" id="banSub" placeholder="e.g. SINGLE ELIMINATION · 32 TEAMS" oninput="renderBanner()">
+      <div class="grid2">
+        <div>
+          <label class="f" for="banDate"><i class="fa-solid fa-calendar"></i> DATE</label>
+          <input type="text" id="banDate" placeholder="e.g. NOVEMBER 1" oninput="renderBanner()">
+        </div>
+        <div>
+          <label class="f" for="banTime"><i class="fa-solid fa-clock"></i> TIME</label>
+          <input type="text" id="banTime" placeholder="e.g. 8:00 PM" oninput="renderBanner()">
+        </div>
+      </div>
+      <label class="f" for="banPrize">PRIZE (OPTIONAL)</label>
+      <input type="text" id="banPrize" placeholder="e.g. ₱5,000 + TROPHY" oninput="renderBanner()">
+      <label class="f" for="banSponsor">SPONSOR TEXT (OPTIONAL)</label>
+      <input type="text" id="banSponsor" value="DGC eSTORE" oninput="renderBanner()">
+      <div class="hint">Same premium theme — the <b>DGC shield logo is centered in the header</b>, with imgur logos and sponsor QR.</div>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="downloadDocPNG('bannerDoc','banner')"><i class="fa-solid fa-image"></i> PNG</button>
+        <button class="btn ghost" onclick="downloadDocJPG('bannerDoc','banner')"><i class="fa-solid fa-file-image"></i> JPG</button>
+        <button class="btn teal" onclick="copyDocImage('bannerDoc')"><i class="fa-solid fa-copy"></i> COPY</button>
+      </div>
+      <div class="status" id="bannerStatus"></div>
+    </section>
+    <section class="panel">
+      <h2><i class="fa-solid fa-eye"></i> BANNER PREVIEW</h2>
+      <div class="doc-wrap"><div class="doc" style="background:transparent;box-shadow:none;padding:0;overflow:visible;" id="bannerDocWrap"><div id="bannerDoc" style="background:#ffffff;border:2px solid var(--gold-d);border-radius:14px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.35);"></div></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ==================== VIEW: TEAM LOGOS ====================== -->
+<!-- ============================================================ -->
+<div class="view" id="view-logos">
+  <div style="display:grid;grid-template-columns:minmax(320px,380px) 1fr;gap:24px;align-items:start;" class="gen-layout">
+    <section class="panel">
+      <h2><i class="fa-solid fa-circle-notch"></i> TEAM LOGOS COLLAGE</h2>
+      <div class="hint" style="margin-top:0">Pulls every team (name + logo) from the current <b>BRACKET</b> tab — including uploaded logos. Default logo is used when a team has none.</div>
+      <div class="btnrow">
+        <button class="btn" onclick="renderLogos();showToast('Collage refreshed from bracket teams')"><i class="fa-solid fa-rotate"></i> REFRESH FROM BRACKET</button>
+        <button class="btn ghost" onclick="downloadDocPNG('logosDoc','team-logos')"><i class="fa-solid fa-image"></i> PNG</button>
+        <button class="btn ghost" onclick="downloadDocJPG('logosDoc','team-logos')"><i class="fa-solid fa-file-image"></i> JPG</button>
+        <button class="btn teal" onclick="copyDocImage('logosDoc')"><i class="fa-solid fa-copy"></i> COPY</button>
+      </div>
+      <div class="status" id="logosStatus"></div>
+    </section>
+    <section class="panel">
+      <h2><i class="fa-solid fa-eye"></i> COLLAGE PREVIEW</h2>
+      <div class="doc-wrap"><div class="doc" id="logosDoc"></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ==================== VIEW: TOURNAMENTS (HUB) =============== -->
+<!-- ============================================================ -->
+<div class="view" id="view-hub">
+  <div class="panel">
+    <h2><i class="fa-solid fa-table-columns"></i> ORGANIZER DASHBOARD</h2>
+    <div class="stat-cards" id="hubStats"></div>
+    <div class="fb-status" id="fbStatus"><i class="fa-solid fa-plug"></i> Checking cloud connection…</div>
+    <div class="hint" style="margin-top:6px">Tournaments are saved to <b>Firebase</b> so you can open and manage them on <b>any device</b>. Use this to track UPCOMING, ONGOING, PENDING and COMPLETED tournaments.</div>
+  </div>
+
+  <div class="panel">
+    <h2><i class="fa-solid fa-plus"></i> CREATE NEW TOURNAMENT</h2>
+    <div class="grid3">
+      <div>
+        <label class="f" for="hubName">TOURNAMENT NAME</label>
+        <input type="text" id="hubName" placeholder="e.g. DGC Championship — Season 2">
+      </div>
+      <div>
+        <label class="f" for="hubStatusSel">STATUS</label>
+        <select id="hubStatusSel">
+          <option value="upcoming">UPCOMING</option>
+          <option value="ongoing">ONGOING</option>
+          <option value="pending">PENDING</option>
+          <option value="completed">COMPLETED</option>
+        </select>
+      </div>
+      <div>
+        <label class="f" for="hubNote">NOTE (OPTIONAL)</label>
+        <input type="text" id="hubNote" placeholder="e.g. 32 teams · MLBB · Nov 15">
+      </div>
+    </div>
+    <div class="hint">Creates a new tournament and saves the <b>current bracket</b> into it (teams, winners, scores, logos). You can keep editing the bracket and re-save with <b>UPDATE</b>.</div>
+    <div class="btnrow">
+      <button class="btn" onclick="hubCreate()"><i class="fa-solid fa-trophy"></i> CREATE TOURNAMENT</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2><i class="fa-solid fa-list"></i> MY TOURNAMENTS</h2>
+    <div class="hub-tabs" id="hubTabs">
+      <button class="on" data-st="all"><i class="fa-solid fa-border-all"></i> ALL <span class="hub-count" id="cnt-all">0</span></button>
+      <button data-st="upcoming"><i class="fa-solid fa-hourglass-start"></i> UPCOMING <span class="hub-count" id="cnt-upcoming">0</span></button>
+      <button data-st="ongoing"><i class="fa-solid fa-play"></i> ONGOING <span class="hub-count" id="cnt-ongoing">0</span></button>
+      <button data-st="pending"><i class="fa-solid fa-pause"></i> PENDING <span class="hub-count" id="cnt-pending">0</span></button>
+      <button data-st="completed"><i class="fa-solid fa-check"></i> COMPLETED <span class="hub-count" id="cnt-completed">0</span></button>
+    </div>
+    <div id="hubList"></div>
+  </div>
+</div>
+</main>
+
+<script>
+/* ==================== CORE HELPERS ==================== */
+const DEFAULT_LOGO = 'https://i.imgur.com/jiS3Xh7.png';
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function safeLogo(u){ u = (u||'').trim(); return /^(https?:\/\/|data:image\/)/i.test(u) ? u : null; }
+function trunc(s,n){ s = String(s||''); return s.length > n ? s.slice(0, n-1) + '\u2026' : s; }
+function $(id){ return document.getElementById(id); }
+function showToast(message, type){
+  type = type || 'success';
+  const existing = document.querySelector('.dgc-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'dgc-toast';
+  toast.style.cssText = 'position:fixed;top:100px;right:20px;background:'+(type==='error'?'#ff4757':type==='warning'?'#ffb800':'#00d084')+';color:white;padding:16px 24px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.3);z-index:99999;font-weight:600;animation:slideIn 0.3s ease;display:flex;align-items:center;gap:10px;max-width:320px;font-family:Inter,sans-serif;';
+  toast.innerHTML = '<i class="fas '+(type==='error'?'fa-exclamation-circle':type==='warning'?'fa-exclamation-triangle':'fa-check-circle')+'"></i> '+esc(message);
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.style.animation='slideOut 0.3s ease'; setTimeout(function(){ toast.remove(); },300); }, 3000);
+}
+const toastStyle = document.createElement('style');
+toastStyle.textContent = '@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}} @keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}';
+document.head.appendChild(toastStyle);
+function makeQR(el, url, size, dark){
+  el.innerHTML = '';
+  if(!url) return;
+  try{ new QRCode(el, { text:url, width:size||84, height:size||84, colorDark:dark||'#0b3d3f', colorLight:'#ffffff' }); }catch(e){}
+}
+
+/* ==================== STATE ==================== */
+const state = { teams:[], logos:[], dq:[], times:[], scores:{}, sched:{}, n:8, mode:'single', w:{wb:[],lb:[],gf:[null,null]}, live:false };
+let bc = null;
+let matchSeq = 0;
+let dragTeamIdx = null;
+
+const ROUND_NAMES = { 2:['SEMIFINALS','GRAND FINALS'], 3:['QUARTERFINALS','SEMIFINALS','GRAND FINALS'], 4:['ROUND OF 16','QUARTERFINALS','SEMIFINALS','GRAND FINALS'], 5:['ROUND OF 32','ROUND OF 16','QUARTERFINALS','SEMIFINALS','GRAND FINALS'], 6:['ROUND OF 64','ROUND OF 32','ROUND OF 16','QUARTERFINALS','SEMIFINALS','GRAND FINALS'] };
+
+/* ==================== BRACKET ENGINE ==================== */
+function fillSample(){
+  const samples = ["DGC ALPHA","DGC VORTEX","TEAM HALCYON","NOVA SYNDICATE","DGC ECLIPSE","IRON PHOENIX","DGC NOVA","CRIMSON WOLVES","DGC TEMPEST","VOID STRIKERS","DGC SPECTRE","GOLDEN PANDAS","DGC RAPTOR","SHADOW CLAN","DGC FALCON","MEGA KNIGHTS"];
+  const gens = ["PHOENIX","VIPER","TITAN","REAPER","ONYX","FROST","BLAZE","STORM","HAVOC","SENTRY","DRIFT","PULSE","QUANTUM","ATLAS","NOVA","ZEPHYR"];
+  let list = samples.slice(0, Math.min(state.n, samples.length));
+  let i = list.length;
+  while(list.length < state.n){ list.push('DGC ' + gens[i % gens.length] + (Math.floor(i / gens.length) > 0 ? ' ' + (Math.floor(i / gens.length) + 1) : '')); i++; }
+  $('teamsBox').value = list.join('\n');
+  buildBracket();
+}
+
+function meta(){
+  const n = state.n, R = Math.log2(n);
+  let m = n / 2;
+  const wb = [];
+  for(let r = 0; r < R; r++){ wb.push(m); m = Math.floor(m / 2); }
+  const lb = [];
+  if(state.mode === 'double'){ let s = n / 4; lb.push(s); lb.push(s); while(s > 1){ s = s / 2; lb.push(s); lb.push(s); } }
+  return { wb: wb, lb: lb };
+}
+function parseTimes(){ state.times = ($('timesBox').value || '').split('\n').map(function(s){ return s.trim(); }); }
+const MONTHS = {jan:'January',feb:'February',mar:'March',apr:'April',may:'May',jun:'June',jul:'July',aug:'August',sep:'September',sept:'September',oct:'October',nov:'November',dec:'December'};
+function formatMatchTime(s){
+  s = (s || '').trim();
+  if(!s) return '';
+  const m = s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2})\s*[|\u2022\-\u2013\u2014]\s*(.+)$/);
+  if(m){
+    const key = m[1].toLowerCase().replace('.','').slice(0,4);
+    const mon = MONTHS[key] || MONTHS[m[1].toLowerCase().slice(0,3)] || m[1];
+    return mon + ' ' + m[2] + ' | ' + m[3].trim();
+  }
+  return s;
+}
+function fmtSchedDate(iso){
+  if(!iso) return '';
+  const p = String(iso).split('-');
+  if(p.length < 3) return '';
+  const d = new Date(+p[0], +p[1] - 1, +p[2]);
+  if(isNaN(d)) return '';
+  return d.toLocaleDateString('en-US', { month:'long', day:'numeric' }).toUpperCase();
+}
+function fmtSchedTime(t){
+  if(!t) return '';
+  const p = String(t).split(':');
+  let h = +p[0] || 0, mn = +p[1] || 0;
+  const ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ':' + String(mn).padStart(2, '0') + ' ' + ap;
+}
+
+function teamsBoxChanged(){
+  const teams = $('teamsBox').value.split('\n').map(s => s.trim());
+  if(teams.length > state.n) $('liveStatus').textContent = 'Note: bracket format holds ' + state.n + ' teams — extra lines will be trimmed on GENERATE.';
+  buildBracket();
+}
+
+function buildBracket(){
+  const v = ($('tFormat').value || 'single-8').split('-');
+  state.mode = v[0]; state.n = parseInt(v[1]);
+  parseTimes();
+  let teams = $('teamsBox').value.split('\n').map(s => s.trim()).filter(Boolean);
+  while(teams.length < state.n) teams.push('TEAM ' + (teams.length + 1));
+  state.teams = teams.slice(0, state.n);
+  $('teamsBox').value = state.teams.join('\n');
+  const lbox = $('logosBox');
+  state.logos = lbox ? lbox.value.split('\n').map(s => s.trim()) : state.logos.slice(0, state.teams.length);
+  while(state.logos.length < state.teams.length) state.logos.push('');
+  const mt = meta();
+  state.w = { wb: mt.wb.map(s => new Array(s).fill(null)), lb: mt.lb.map(s => new Array(s).fill(null)), gf: [null, null] };
+  state.dq = state.dq.filter(nm => state.teams.indexOf(nm) !== -1);
+  checkDuplicates(); render(); broadcast();
+}
+
+function resetBracket(){
+  state.w.wb.forEach(a => a.fill(null));
+  state.w.lb.forEach(a => a.fill(null));
+  state.w.gf = [null, null];
+  state.dq = []; state.scores = {};
+  render(); broadcast();
+}
+
+function logoFor(name){
+  if(!name) return null;
+  const i = state.teams.indexOf(name);
+  if(i !== -1 && state.logos[i]) return safeLogo(state.logos[i]);
+  return DEFAULT_LOGO;
+}
+
+function slotsArr(kind, r, m){
+  const T = state.teams;
+  if(kind === 'wb'){ if(r === 0) return [ T[m*2] || null, T[m*2+1] || null ]; return [ winnerOf('wb', r-1, m*2), winnerOf('wb', r-1, m*2+1) ]; }
+  if(kind === 'lb'){
+    if(r === 0) return [ loserOf('wb', 0, m*2), loserOf('wb', 0, m*2+1) ];
+    if(r % 2 === 1) return [ winnerOf('lb', r-1, m), loserOf('wb', (r+1)/2, m) ];
+    return [ winnerOf('lb', r-1, m*2), winnerOf('lb', r-1, m*2+1) ];
+  }
+  const mt = meta();
+  return [ winnerOf('wb', mt.wb.length-1, 0), winnerOf('lb', mt.lb.length-1, 0) ];
+}
+function winnerOf(kind, r, m){ const w = state.w[kind][r][m]; if(w === null || w === undefined) return null; return slotsArr(kind, r, m)[w]; }
+function loserOf(kind, r, m){ const w = state.w[kind][r][m]; if(w === null || w === undefined) return null; return slotsArr(kind, r, m)[1 - w]; }
+function isDQ(name){ return name && state.dq.indexOf(name) !== -1; }
+
+function toggleDQ(name){
+  const i = state.dq.indexOf(name);
+  if(i === -1) state.dq.push(name); else state.dq.splice(i, 1);
+  validate(); render(true); broadcast();
+}
+function pickWinner(kind, r, m, idx){
+  const name = slotsArr(kind, r, m)[idx];
+  if(!name || isDQ(name)) return;
+  if(kind === 'gf'){ state.w.gf[r] = idx; } else { state.w[kind][r][m] = idx; }
+  validate(); render(true); broadcast();
+}
+function scoreInput(inp){
+  const sk = inp.dataset.sk;
+  if(inp.value.trim()) state.scores[sk] = inp.value.trim(); else delete state.scores[sk];
+  const span = inp.parentElement.querySelector('.score-txt');
+  if(span){ span.textContent = inp.value.trim(); span.classList.toggle('has-val', !!inp.value.trim()); }
+  persist(); broadcast();
+}
+function validate(){
+  const mt = meta();
+  [['wb', mt.wb], ['lb', mt.lb]].forEach(pair => {
+    const kind = pair[0], sizes = pair[1];
+    sizes.forEach((size, r) => {
+      for(let m = 0; m < size; m++){
+        if(state.w[kind][r][m] !== null){
+          const nm = slotsArr(kind, r, m)[state.w[kind][r][m]];
+          if(!nm || isDQ(nm)) state.w[kind][r][m] = null;
+        }
+        if(state.w[kind][r][m] === null){
+          const s = slotsArr(kind, r, m);
+          if(s[0] && s[1]){ if(isDQ(s[0]) && !isDQ(s[1])) state.w[kind][r][m] = 1; else if(isDQ(s[1]) && !isDQ(s[0])) state.w[kind][r][m] = 0; }
+        }
+      }
+    });
+  });
+  if(state.mode === 'double'){
+    const s0 = slotsArr('gf', 0, 0);
+    if(state.w.gf[0] === null || !s0[state.w.gf[0]] || isDQ(s0[state.w.gf[0]])) state.w.gf[0] = null;
+    if(state.w.gf[0] === null && s0[0] && s0[1]){ if(isDQ(s0[0]) && !isDQ(s0[1])) state.w.gf[0] = 1; else if(isDQ(s0[1]) && !isDQ(s0[0])) state.w.gf[0] = 0; }
+    if(state.w.gf[0] !== 1) state.w.gf[1] = null;
+    else { const s1 = slotsArr('gf', 1, 0); if(state.w.gf[1] !== null && (!s1[state.w.gf[1]] || isDQ(s1[state.w.gf[1]]))) state.w.gf[1] = null; }
+  }
+}
+
+/* ---- match records: W-L per team computed from the bracket ---- */
+function computeRecords(){
+  const rec = {};
+  function addWin(n){ if(!n) return; rec[n] = rec[n] || {w:0,l:0}; rec[n].w++; }
+  function addLoss(n){ if(!n) return; rec[n] = rec[n] || {w:0,l:0}; rec[n].l++; }
+  function scan(kind, sizes){
+    sizes.forEach((size, r) => {
+      for(let m = 0; m < size; m++){
+        const w = (kind === 'gf') ? state.w.gf[r] : state.w[kind][r][m];
+        if(w === null || w === undefined) continue;
+        const s = slotsArr(kind, r, m);
+        if(s[0] && s[1]){ addWin(s[w]); addLoss(s[1 - w]); }
+      }
+    });
+  }
+  const mt = meta();
+  scan('wb', mt.wb);
+  if(state.mode === 'double') scan('lb', mt.lb.concat([1]));
+  return rec;
+}
+function recStr(n){ const r = computeRecords()[n]; return r ? (r.w + ' - ' + r.l) : '0 - 0'; }
+
+function finalResultsData(){
+  const mt = meta();
+  const places = [];
+  if(state.mode === 'single'){
+    const R = mt.wb.length;
+    const fw = state.w.wb[R-1][0];
+    if(fw === null || fw === undefined) return null;
+    const fs = slotsArr('wb', R-1, 0);
+    const champ = fs[fw], runner = fs[1 - fw];
+    if(!champ || isDQ(champ)) return null;
+    places.push(champ);
+    if(runner && !isDQ(runner)) places.push(runner);
+    if(R >= 2){
+      const semiR = R - 2;
+      for(let m = 0; m < mt.wb[semiR]; m++){
+        const sw = state.w.wb[semiR][m];
+        if(sw === null || sw === undefined) continue;
+        const s = slotsArr('wb', semiR, m);
+        const loser = s[1 - sw];
+        if(loser && !isDQ(loser) && places.indexOf(loser) === -1) places.push(loser);
+      }
+    }
+    return places;
+  }
+  /* double elimination: 1 champ · 2 grand-final loser · 3 LB final loser · 4 LB semi loser */
+  if(state.w.gf[0] === null || state.w.gf[0] === undefined) return null;
+  const s0 = slotsArr('gf', 0, 0);
+  const reset = (state.w.gf[1] !== null && state.w.gf[1] !== undefined);
+  const champ = reset ? s0[state.w.gf[1]] : s0[state.w.gf[0]];
+  const runner = reset ? s0[1 - state.w.gf[1]] : s0[1 - state.w.gf[0]];
+  if(!champ || isDQ(champ)) return null;
+  places.push(champ);
+  if(runner && !isDQ(runner) && places.indexOf(runner) === -1) places.push(runner);
+  const L = mt.lb.length;
+  const lw = state.w.lb[L-1][0];
+  if(lw !== null && lw !== undefined){
+    const s = slotsArr('lb', L-1, 0);
+    const loser = s[1 - lw];
+    if(loser && !isDQ(loser) && places.indexOf(loser) === -1) places.push(loser);
+  }
+  if(L >= 2 && mt.lb[L-2] === 1){
+    const pw = state.w.lb[L-2][0];
+    if(pw !== null && pw !== undefined){
+      const s = slotsArr('lb', L-2, 0);
+      const loser = s[1 - pw];
+      if(loser && !isDQ(loser) && places.indexOf(loser) === -1) places.push(loser);
+    }
+  }
+  return places;
+}
+function runnerUpName(){
+  const p = finalResultsData();
+  return (p && p[1]) ? p[1] : null;
+}
+function semiFinalists(){
+  const out = [];
+  const mt = meta();
+  const R = mt.wb.length;
+  if(R >= 2){
+    const semiR = R - 2;
+    for(let m = 0; m < mt.wb[semiR]; m++){
+      const s = slotsArr('wb', semiR, m);
+      s.forEach(function(nm){ if(nm && !isDQ(nm) && out.indexOf(nm) === -1) out.push(nm); });
+    }
+  }
+  if(state.mode === 'double'){
+    const L = mt.lb.length;
+    const lw = state.w.lb[L-1][0];
+    if(lw !== null && lw !== undefined){
+      const s = slotsArr('lb', L-1, 0);
+      const loser = s[1 - lw];
+      if(loser && !isDQ(loser) && out.indexOf(loser) === -1) out.push(loser);
+    }
+  }
+  return out;
+}
+
+function trophySVG(title, champ){
+  /* split tournament name into two engraved lines that fit INSIDE the cup */
+  const words = String(title || 'TOURNAMENT').split(' ');
+  let l1 = '', l2 = '';
+  words.forEach(function(w){ const t = (l1 ? l1 + ' ' : '') + w; if(!l2 && t.length <= 15) l1 = t; else l2 = (l2 ? l2 + ' ' : '') + w; });
+  l1 = trunc(l1, 18); l2 = trunc(l2, 18);
+  const c = trunc(champ, 14);
+  return '<svg class="champ-trophy" viewBox="0 0 240 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trophy">'
+    + '<defs>'
+    + '<linearGradient id="tgBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7cf"/><stop offset=".28" stop-color="#f2d060"/><stop offset=".62" stop-color="#c69a33"/><stop offset="1" stop-color="#8a6a24"/></linearGradient>'
+    + '<linearGradient id="tgRim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a6a24"/><stop offset=".5" stop-color="#fdf2b3"/><stop offset="1" stop-color="#8a6a24"/></linearGradient>'
+    + '<linearGradient id="tgStem" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a8873a"/><stop offset=".5" stop-color="#f9e7a8"/><stop offset="1" stop-color="#a8873a"/></linearGradient>'
+    + '<linearGradient id="tgBase" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d5f5f"/><stop offset="1" stop-color="#03100f"/></linearGradient>'
+    + '<linearGradient id="tgShade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(255,255,255,0)"/><stop offset=".6" stop-color="rgba(255,255,255,0)"/><stop offset="1" stop-color="rgba(60,40,0,.4)"/></linearGradient>'
+    + '<radialGradient id="tgGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(217,182,74,.55)"/><stop offset="1" stop-color="rgba(217,182,74,0)"/></radialGradient>'
+    + '</defs>'
+    + '<ellipse cx="120" cy="272" rx="76" ry="9" fill="rgba(0,0,0,.35)"/>'
+    /* handles */
+    + '<path d="M74 46 C36 46 24 84 46 104 C58 115 74 117 84 108 L78 92 C70 99 58 96 51 87 C41 74 49 60 74 60 Z" fill="url(#tgBody)" stroke="#6f531a" stroke-width="2.5"/>'
+    + '<path d="M166 46 C204 46 216 84 194 104 C182 115 166 117 156 108 L162 92 C170 99 182 96 189 87 C199 74 191 60 166 60 Z" fill="url(#tgBody)" stroke="#6f531a" stroke-width="2.5"/>'
+    /* cup body */
+    + '<path d="M74 40 C72 52 70 64 70 76 C70 108 92 128 120 128 C148 128 170 108 170 76 C170 64 168 52 166 40 Z" fill="url(#tgBody)" stroke="#6f531a" stroke-width="2.5"/>'
+    + '<path d="M74 40 C72 52 70 64 70 76 C70 108 92 128 120 128 C148 128 170 108 170 76 C170 64 168 52 166 40 Z" fill="url(#tgShade)"/>'
+    /* rim */
+    + '<ellipse cx="120" cy="40" rx="47" ry="9" fill="url(#tgRim)" stroke="#6f531a" stroke-width="2"/>'
+    + '<ellipse cx="120" cy="40" rx="36" ry="6" fill="#062b2d" stroke="#9a7a2a" stroke-width="1"/>'
+    /* shine highlights */
+    + '<ellipse cx="92" cy="80" rx="10" ry="30" fill="rgba(255,255,255,.5)"/>'
+    + '<ellipse cx="146" cy="66" rx="5" ry="16" fill="rgba(255,255,255,.35)"/>'
+    /* star emblem + tournament name engraved INSIDE the trophy */
+    + '<path d="M120 53 l5.4 11 12.1 1.8 -8.8 8.5 2.1 12 -10.8 -5.7 -10.8 5.7 2.1 -12 -8.8 -8.5 12.1 -1.8 Z" fill="#0b3d3f" stroke="#fdf2b3" stroke-width="1.3"/>'
+    + (l1 ? '<text x="120" y="95" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" fill="#123c3e" letter-spacing=".5">' + esc(l1) + '</text>' : '')
+    + (l2 ? '<text x="120" y="107" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" fill="#123c3e" letter-spacing=".5">' + esc(l2) + '</text>' : '')
+    /* neck + ring */
+    + '<path d="M106 128 h28 l6 16 h-40 Z" fill="url(#tgStem)" stroke="#6f531a" stroke-width="2"/>'
+    + '<rect x="98" y="144" width="44" height="8" rx="4" fill="url(#tgRim)" stroke="#6f531a" stroke-width="1.5"/>'
+    /* base with champion name plate */
+    + '<path d="M88 152 h64 l9 24 h-82 Z" fill="rgba(255,255,255,0)" stroke="#d9b64a" stroke-width="2.5"/>'
+    + '<rect x="66" y="176" width="108" height="36" rx="9" fill="rgba(255,255,255,0)" stroke="#d9b64a" stroke-width="3"/>'
+    + '<rect x="72" y="182" width="96" height="24" rx="6" fill="none" stroke="#d9b64a" stroke-width="1" opacity=".7"/>'
+    + '<text x="120" y="199" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="11" font-weight="900" fill="#0b3d3f" letter-spacing="1">' + esc(c) + '</text>'
+    + '</svg>';
+}
+
+function persist(){
+  try{ localStorage.setItem('dgc_bracket', JSON.stringify({ mode: state.mode, n: state.n, teams: state.teams, logos: state.logos, dq: state.dq, times: state.times, scores: state.scores, sched: state.sched, w: state.w, tName: $('tName').value, evDate: $('evDate').value, evTime: $('evTime').value, showDateTime: $('showDateTime').checked })); }catch(e){}
+}
+
+function render(skipEditor){
+  const titleText = $('tName').value || 'TOURNAMENT';
+  $('bTitle').textContent = titleText;
+
+  const showDT = $('showDateTime').checked;
+  const d = $('evDate').value.trim(), t = $('evTime').value.trim();
+  $('bhMeta').style.display = (showDT && (d || t)) ? 'flex' : 'none';
+  $('mDate').style.display = (showDT && d) ? 'inline-flex' : 'none';
+  $('mTime').style.display = (showDT && t) ? 'inline-flex' : 'none';
+  $('mDateTxt').textContent = d; $('mTimeTxt').textContent = t;
+
+  renderSponsor();
+  renderFinalResults();
+
+  const el = $('bracket');
+  el.innerHTML = '';
+  const mt = meta();
+  const names = ROUND_NAMES[mt.wb.length] || [];
+  const isD = state.mode === 'double';
+  matchSeq = 0;
+
+  mt.wb.forEach((size, r) => {
+    const col = document.createElement('div'); col.className = 'round';
+    col.innerHTML = '<div class="round-label">' + (isD ? 'W \u00B7 ' : '') + (names[r] || ('ROUND ' + (r+1))) + '</div>';
+    for(let m = 0; m < size; m++) col.appendChild(matchEl('wb', r, m, m + 1));
+    if(r === 0 && state.teams.length < state.n){
+      const g = document.createElement('div');
+      g.className = 'slot empty addteam-gap';
+      g.style.cssText = 'cursor:pointer;justify-content:center;border:1px dashed rgba(217,182,74,.65);color:var(--gold-d);font-weight:800;letter-spacing:1px;';
+      g.innerHTML = '<i class="fa-solid fa-plus"></i> ADD TEAM';
+      g.onclick = addTeam;
+      col.appendChild(g);
+    }
+    el.appendChild(col);
+  });
+
+  if(isD){
+    mt.lb.forEach((size, r) => {
+      const col = document.createElement('div'); col.className = 'round';
+      col.innerHTML = '<div class="round-label">L \u00B7 ROUND ' + (r+1) + '</div>';
+      for(let m = 0; m < size; m++) col.appendChild(matchEl('lb', r, m, m + 1));
+      el.appendChild(col);
+    });
+    const gfCol = document.createElement('div'); gfCol.className = 'round';
+    gfCol.innerHTML = '<div class="round-label">GRAND FINALS</div>';
+    gfCol.appendChild(matchEl('gf', 0, 0, 1));
+    if(state.w.gf[0] === 1) gfCol.appendChild(matchEl('gf', 1, 0, 2));
+    el.appendChild(gfCol);
+  }
+
+  const champ = document.createElement('div'); champ.className = 'round';
+  champ.innerHTML = '<div class="round-label">CHAMPION</div>';
+  const box = document.createElement('div'); box.className = 'champ-box';
+  const cn = champName();
+  box.innerHTML = '<div class="lbl">TOURNAMENT CHAMPION</div>' + trophySVG(titleText, (cn === '\u2014' ? 'TBD' : cn));
+  champ.appendChild(box);
+  el.appendChild(champ);
+
+  persist();
+  if(!skipEditor) renderTeamEditor();
+  requestAnimationFrame(drawConnectors);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(drawConnectors);
+}
+
+/* ---- FINAL RESULTS block (shows above bracket, below header, when champion exists) ---- */
+function medalSVG(kind, num){
+  const C = { gold:{a:'#fff6c2',b:'#f0c93f',c:'#9c7410',e:'#7a5c18'},
+              silver:{a:'#ffffff',b:'#c3ccd3',c:'#7d8890',e:'#5f6a72'},
+              bronze:{a:'#ffd8a8',b:'#cd7f32',c:'#7c4a1d',e:'#5e3713'},
+              steel:{a:'#eef3f6',b:'#a9bac4',c:'#64757f',e:'#4a5862'} }[kind];
+  return '<svg class="fr-medal3d" viewBox="0 0 64 96" width="30" height="45" xmlns="http://www.w3.org/2000/svg">'
+    + '<defs>'
+    + '<linearGradient id="rb-' + kind + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d5f5f"/><stop offset="1" stop-color="#04100f"/></linearGradient>'
+    + '<radialGradient id="md-' + kind + '" cx=".35" cy=".28" r=".9"><stop offset="0" stop-color="' + C.a + '"/><stop offset=".45" stop-color="' + C.b + '"/><stop offset="1" stop-color="' + C.c + '"/></radialGradient>'
+    + '</defs>'
+    + '<path d="M14 2 L30 34 L20 41 L4 8 Z" fill="url(#rb-' + kind + ')" stroke="#d9b64a" stroke-width="1.5"/>'
+    + '<path d="M50 2 L34 34 L44 41 L60 8 Z" fill="url(#rb-' + kind + ')" stroke="#d9b64a" stroke-width="1.5"/>'
+    + '<circle cx="32" cy="60" r="25" fill="url(#md-' + kind + ')" stroke="' + C.e + '" stroke-width="2.5"/>'
+    + '<circle cx="32" cy="60" r="17.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>'
+    + '<ellipse cx="23" cy="49" rx="8.5" ry="5" fill="rgba(255,255,255,.55)"/>'
+    + '<text x="32" y="69" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="23" font-weight="900" fill="rgba(0,0,0,.3)">' + num + '</text>'
+    + '<text x="32" y="67" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="23" font-weight="900" fill="#ffffff">' + num + '</text>'
+    + '</svg>';
+}
+function renderFinalResults(){
+  const fr = $('finalResults');
+  const places = finalResultsData();
+  if(!places){ fr.style.display = 'none'; fr.innerHTML = ''; return; }
+  const MEDALS = [
+    ['gold',   1, 'CHAMPION'],
+    ['silver', 2, '2ND PLACE'],
+    ['bronze', 3, '3RD PLACE'],
+    ['steel',  4, '4TH PLACE']
+  ];
+  function box(kind, num, rankLabel, nm){
+    return '<div class="fr-item">'
+      + '<span class="fr-medal3d">' + medalSVG(kind, num) + '</span>'
+      + '<div class="fr-info"><span class="fr-rank">' + rankLabel + '</span><span class="fr-name">' + esc(nm) + '</span></div>'
+      + '<span class="fr-rec">' + recStr(nm) + '</span></div>';
+  }
+  let html = '<div class="fr-title"><i class="fa-solid fa-flag-checkered"></i> FINAL RESULTS <i class="fa-solid fa-flag-checkered"></i></div><div class="fr-list">';
+  for(let i = 0; i < 4; i++){
+    const nm = places[i];
+    const md = MEDALS[i];
+    if(nm) html += box(md[0], md[1], md[2], nm);
+    else html += '<div class="fr-item"><div class="fr-info"><span class="fr-rank">' + md[2] + '</span><span class="fr-name" style="opacity:.45">TBD</span></div></div>';
+  }
+  fr.innerHTML = html + '</div>';
+  fr.style.display = 'block';
+}
+
+function matchEl(kind, r, m, labelNum){
+  const match = document.createElement('div'); match.className = 'match';
+  const mkey = kind + '|' + r + '|' + m;
+  const sched = state.sched[mkey] || {};
+  const hasSched = !!(sched.date || sched.time);
+  const lbl = document.createElement('div'); lbl.className = 'match-label';
+  lbl.style.display = 'flex'; lbl.style.alignItems = 'center'; lbl.style.gap = '4px'; lbl.style.flexWrap = 'wrap';
+  function mkSchedInput(type, val){
+    const inp = document.createElement('input');
+    inp.type = type; inp.className = 'ms-inp'; inp.value = val || '';
+    inp.onchange = function(){
+      if(!state.sched[mkey]) state.sched[mkey] = {};
+      if(this.value) state.sched[mkey][type] = this.value;
+      else delete state.sched[mkey][type];
+      if(!state.sched[mkey].date && !state.sched[mkey].time) delete state.sched[mkey];
+      persist(); render(true); broadcast();
+    };
+    lbl.appendChild(inp);
+    return inp;
+  }
+  const dInp = mkSchedInput('date', sched.date);
+  const tInp = mkSchedInput('time', sched.time);
+  function openPick(inp){ try{ if(inp.showPicker){ inp.showPicker(); return; } }catch(e){} inp.focus(); }
+  function mkSchedBtn(icon, title, inp){
+    const b = document.createElement('button');
+    b.className = 'ms-ic'; b.title = title; b.innerHTML = '<i class="fa-solid ' + icon + '"></i>';
+    b.onclick = function(e){ e.stopPropagation(); openPick(inp); };
+    lbl.appendChild(b);
+    return b;
+  }
+  if(hasSched){
+    mkSchedBtn('fa-calendar', 'Set / change match date', dInp);
+    const dTxt = document.createElement('span'); dTxt.className = 'ms-txt'; dTxt.textContent = fmtSchedDate(sched.date) || 'SET DATE';
+    lbl.appendChild(dTxt);
+    mkSchedBtn('fa-clock', 'Set / change match time', tInp);
+    const tTxt = document.createElement('span'); tTxt.className = 'ms-txt'; tTxt.textContent = fmtSchedTime(sched.time) || 'SET TIME';
+    lbl.appendChild(tTxt);
+    const sClr = document.createElement('button');
+    sClr.className = 'ms-ic'; sClr.title = 'Clear schedule'; sClr.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    sClr.onclick = function(e){ e.stopPropagation(); delete state.sched[mkey]; persist(); render(true); broadcast(); };
+    lbl.appendChild(sClr);
+  } else {
+    const bolt = document.createElement('span'); bolt.innerHTML = '<i class="fa-solid fa-bolt"></i> MATCH ' + labelNum;
+    lbl.appendChild(bolt);
+    mkSchedBtn('fa-calendar', 'Set match date', dInp);
+    mkSchedBtn('fa-clock', 'Set match time', tInp);
+  }
+  const clrBtn = document.createElement('button');
+  clrBtn.className = 'dq-btn'; clrBtn.textContent = '\u21BA'; clrBtn.title = 'Clear this match (winner + points)';
+  clrBtn.style.cssFloat = 'right'; clrBtn.style.marginTop = '-2px';
+  clrBtn.onclick = function(e){ e.stopPropagation(); clearMatch(kind, r, m); };
+  lbl.appendChild(clrBtn);
+  match.appendChild(lbl);
+  const ti = hasSched ? '' : formatMatchTime(state.times[matchSeq]);
+  if(ti){ const mtEl = document.createElement('div'); mtEl.className = 'mtime'; mtEl.innerHTML = '<i class="fa-solid fa-clock"></i>' + esc(ti); match.appendChild(mtEl); }
+  matchSeq++;
+  const slots = slotsArr(kind, r, m);
+  const sel = (kind === 'gf') ? state.w.gf[r] : state.w[kind][r][m];
+  slots.forEach((name, i) => {
+    const b = document.createElement('div');
+    const dq = isDQ(name);
+    b.className = 'slot' + (name ? '' : ' empty') + (sel === i && name && !dq ? ' winner' : '') + (dq ? ' dq' : '');
+    const logo = logoFor(name);
+    const sk = kind + '|' + r + '|' + m + '|' + i;
+    const sv = state.scores[sk] || '';
+    b.innerHTML = (logo
+        ? '<img class="tlogo" src="' + logo + '" alt="" crossorigin="anonymous" onerror="this.outerHTML=\'<span class=&quot;tlogo ph&quot;><i class=&quot;fa-solid fa-shield&quot;></i></span>\'">'
+        : '<span class="tlogo ph"><i class="fa-solid fa-question"></i></span>')
+      + '<span class="nm">' + (name ? esc(name) : 'TBD') + '</span>'
+      + '<input class="score-inp" type="text" inputmode="numeric" placeholder="PT" value="' + esc(sv) + '" data-sk="' + sk + '" onclick="event.stopPropagation()" oninput="scoreInput(this)">'
+      + '<span class="score-txt' + (sv ? ' has-val' : '') + '">' + esc(sv) + '</span>';
+    if(name){
+      b.onclick = function(){ pickWinner(kind, r, m, i); };
+      const dqBtn = document.createElement('button');
+      dqBtn.className = 'dq-btn'; dqBtn.textContent = 'DQ'; dqBtn.title = 'Mark / unmark as disqualified';
+      dqBtn.onclick = function(e){ e.stopPropagation(); toggleDQ(name); };
+      b.appendChild(dqBtn);
+      /* inline rename: double-click the team name */
+      const nmSpan = b.querySelector('.nm');
+      nmSpan.ondblclick = function(e){ e.stopPropagation(); inlineRename(nmSpan, name); };
+      /* drag & drop seed swapping on round 1 */
+      if(kind === 'wb' && r === 0){
+        b.draggable = true;
+        b.addEventListener('dragstart', function(e){
+          try{ e.dataTransfer.setData('text/plain', 'slot:' + (m * 2 + i)); }catch(_){}
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        b.addEventListener('dragover', function(e){ e.preventDefault(); b.style.outline = '2px dashed #d9b64a'; b.style.outlineOffset = '2px'; });
+        b.addEventListener('dragleave', function(){ b.style.outline = ''; });
+        b.addEventListener('drop', function(e){
+          e.preventDefault(); e.stopPropagation(); b.style.outline = '';
+          const data = e.dataTransfer.getData('text/plain');
+          const target = m * 2 + i;
+          if(data.indexOf('slot:') === 0){ const src = +data.slice(5); if(src !== target) swapSeeds(src, target); }
+          else if(data !== '' && !isNaN(+data)){ placeTeamAt(+data, target); }
+        });
+        /* remove team straight from the preview */
+        const xBtn = document.createElement('button');
+        xBtn.className = 'dq-btn'; xBtn.textContent = '\u00D7'; xBtn.title = 'Remove team from bracket';
+        xBtn.onclick = function(e){ e.stopPropagation(); removeSeed(m * 2 + i); };
+        b.appendChild(xBtn);
+      }
+    } else if(kind === 'wb' && r === 0){
+      /* empty slot: accept drops too */
+      b.addEventListener('dragover', function(e){ e.preventDefault(); b.style.outline = '2px dashed #d9b64a'; });
+      b.addEventListener('dragleave', function(){ b.style.outline = ''; });
+      b.addEventListener('drop', function(e){
+        e.preventDefault(); e.stopPropagation(); b.style.outline = '';
+        const data = e.dataTransfer.getData('text/plain');
+        const target = m * 2 + i;
+        if(data.indexOf('slot:') === 0){ const src = +data.slice(5); if(src !== target) swapSeeds(src, target); }
+        else if(data !== '' && !isNaN(+data)){ placeTeamAt(+data, target); }
+      });
+    }
+    match.appendChild(b);
+  });
+  return match;
+}
+
+function champName(){
+  const mt = meta();
+  if(state.mode === 'single'){
+    const w = state.w.wb[mt.wb.length-1][0];
+    if(w === null) return '\u2014';
+    const nm = slotsArr('wb', mt.wb.length-1, 0)[w];
+    return (nm && !isDQ(nm)) ? nm : '\u2014';
+  }
+  if(state.w.gf[0] === 0) return slotsArr('gf', 0, 0)[0] || '\u2014';
+  if(state.w.gf[1] === 1) return slotsArr('gf', 1, 0)[1] || '\u2014';
+  return '\u2014';
+}
+
+function drawConnectors(){
+  document.querySelectorAll('.conn-m').forEach(e => e.remove());
+  const el = $('bracket');
+  const cols = Array.prototype.slice.call(el.querySelectorAll(':scope > .round'));
+  if(cols.length < 2) return;
+  const mt = meta();
+  const isD = state.mode === 'double';
+  const champBox = cols[cols.length - 1].querySelector('.champ-box');
+  function chain(fromCol, toCol, mode){
+    const fms = fromCol.querySelectorAll('.match');
+    const tms = toCol.querySelectorAll('.match');
+    for(let m = 0; m < fms.length; m++){ const t = (mode === 'one') ? tms[m] : tms[Math.floor(m / 2)]; connect(fms[m], t); }
+  }
+  for(let r = 0; r < mt.wb.length - 1; r++) chain(cols[r], cols[r + 1], 'pair');
+  if(!isD){ connect(cols[mt.wb.length - 1].querySelector('.match'), champBox); return; }
+  for(let r = 0; r < mt.lb.length - 1; r++){ chain(cols[mt.wb.length + r], cols[mt.wb.length + r + 1], (r % 2 === 0) ? 'one' : 'pair'); }
+  const gfCol = cols[mt.wb.length + mt.lb.length];
+  const gfMatches = gfCol.querySelectorAll('.match');
+  connect(cols[mt.wb.length - 1].querySelector('.match'), gfMatches[0]);
+  connect(cols[mt.wb.length + mt.lb.length - 1].querySelector('.match'), gfMatches[(state.w.gf[0] === 1 && gfMatches[1]) ? 1 : 0]);
+  connect(gfMatches[gfMatches.length - 1], champBox);
+}
+function connect(fromEl, toEl){
+  if(!fromEl || !toEl) return;
+  const el = $('bracket');
+  const er = el.getBoundingClientRect();
+  const fr = fromEl.getBoundingClientRect(), tr = toEl.getBoundingClientRect();
+  const y1 = fr.top + fr.height / 2 - er.top;
+  const y2 = tr.top + tr.height / 2 - er.top;
+  const x1 = fr.right - er.left + 7;
+  const xJ = tr.left - er.left - 12;
+  const x2 = tr.left - er.left - 1;
+  function mk(cls, left, top, w, h){
+    const d = document.createElement('div');
+    d.className = 'conn conn-m ' + cls;
+    d.style.left = left + 'px'; d.style.top = top + 'px';
+    d.style.width = w + 'px'; d.style.height = h + 'px';
+    el.appendChild(d);
+  }
+  mk('conn-h', x1, y1 - 1, Math.max(xJ - x1, 2), 2);
+  mk('conn-v', xJ, Math.min(y1, y2), 2, Math.max(Math.abs(y2 - y1), 2));
+  mk('conn-h', xJ, y2 - 1, Math.max(x2 - xJ, 2), 2);
+}
+window.addEventListener('resize', function(){ if($('bracket').children.length) drawConnectors(); });
+
+/* ==================== DUPLICATE TEAM DETECTION ==================== */
+function checkDuplicates(){
+  const seen = {}, dups = [];
+  state.teams.forEach(function(nm){
+    const k = (nm || '').trim().toLowerCase();
+    if(!k) return;
+    seen[k] = (seen[k] || 0) + 1;
+  });
+  Object.keys(seen).forEach(function(k){ if(seen[k] > 1) dups.push(k.toUpperCase()); });
+  const banner = $('dupBanner');
+  if(dups.length){
+    $('dupText').textContent = ' DUPLICATE TEAM NAMES DETECTED (' + dups.length + '): ' + dups.join(', ') + ' — please rename or remove duplicates before saving.';
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+    $('dupText').textContent = '';
+  }
+  return dups;
+}
+
+/* ==================== TEAM EDITOR (upload / drag & drop logos) ==================== */
+function syncTeamBoxes(){
+  $('teamsBox').value = state.teams.join('\n');
+  const lb = $('logosBox'); if(lb) lb.value = state.logos.join('\n');
+}
+function renderTeamEditor(){
+  checkDuplicates();
+  const ed = $('teamEditor'); ed.innerHTML = '';
+  state.teams.forEach((nm, i) => {
+    const row = document.createElement('div'); row.className = 'team-row2';
+    const logo = safeLogo(state.logos[i]);
+    row.innerHTML = '<span class="tno" style="display:flex;flex-direction:column;align-items:center;gap:2px"><i class="fa-solid fa-grip-vertical" style="font-size:9px;opacity:.75;cursor:grab"></i>' + String(i+1).padStart(2, '0') + '</span>'
+      + '<input type="text" value="' + esc(nm) + '" placeholder="Team name" data-i="' + i + '" data-k="name">'
+      + '<label class="logo-cell" data-i="' + i + '" title="Click or drag &amp; drop a logo image">'
+      + (logo ? '<img src="' + logo + '" alt="" crossorigin="anonymous">' : '<i class="fa-solid fa-image plc"></i>')
+      + '<span class="chg">CHANGE</span>'
+      + '<input type="file" accept="image/*" hidden>'
+      + '</label>'
+      + '<button class="btn ghost tdel" data-i="' + i + '" title="Remove team"><i class="fa-solid fa-trash"></i></button>';
+    row.draggable = true;
+    row.addEventListener('dragstart', function(e){
+      dragTeamIdx = i;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      try{ e.dataTransfer.setData('text/plain', String(i)); }catch(_){}
+    });
+    row.addEventListener('dragend', function(){
+      dragTeamIdx = null;
+      ed.querySelectorAll('.team-row2').forEach(function(x){ x.classList.remove('dragging','dragover'); });
+    });
+    row.addEventListener('dragover', function(e){
+      if(dragTeamIdx === null || dragTeamIdx === i) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      row.classList.add('dragover');
+    });
+    row.addEventListener('dragleave', function(){ row.classList.remove('dragover'); });
+    row.addEventListener('drop', function(e){
+      e.preventDefault();
+      row.classList.remove('dragover');
+      if(dragTeamIdx === null || dragTeamIdx === i) return;
+      const from = dragTeamIdx;
+      const tm = state.teams.splice(from, 1)[0];
+      state.teams.splice(i, 0, tm);
+      const lg = state.logos.splice(from, 1)[0];
+      state.logos.splice(i, 0, lg);
+      syncTeamBoxes(); checkDuplicates(); validate(); render(); broadcast();
+      showToast('Team moved to seed #' + (i + 1));
+    });
+    ed.appendChild(row);
+  });
+  ed.querySelectorAll('input[data-k]').forEach(function(inp){
+    inp.oninput = function(){
+      const i = +this.dataset.i;
+      if(this.dataset.k === 'name') state.teams[i] = this.value; else state.logos[i] = this.value.trim();
+      syncTeamBoxes(); checkDuplicates(); validate(); render(true); broadcast();
+    };
+  });
+  ed.querySelectorAll('.logo-cell').forEach(function(cell){
+    const i = +cell.dataset.i;
+    const fileInp = cell.querySelector('input[type=file]');
+    fileInp.onchange = function(){ if(this.files && this.files[0]) handleLogoFile(i, this.files[0]); this.value=''; };
+    cell.addEventListener('dragover', function(e){ e.preventDefault(); cell.classList.add('drag'); });
+    cell.addEventListener('dragleave', function(){ cell.classList.remove('drag'); });
+    cell.addEventListener('drop', function(e){
+      e.preventDefault(); cell.classList.remove('drag');
+      if(e.dataTransfer.files && e.dataTransfer.files[0]) handleLogoFile(i, e.dataTransfer.files[0]);
+    });
+  });
+  ed.querySelectorAll('.tdel').forEach(function(b){
+    b.onclick = function(){
+      const i = +this.dataset.i;
+      state.teams.splice(i, 1); state.logos.splice(i, 1);
+      syncTeamBoxes(); checkDuplicates(); validate(); render(); broadcast();
+    };
+  });
+}
+function handleLogoFile(i, file){
+  if(!file.type.match(/^image\//)){ showToast('Please choose an image file.', 'error'); return; }
+  if(file.size > 2 * 1024 * 1024){ showToast('Image is large (over 2MB) — it will be compressed.', 'warning'); }
+  const reader = new FileReader();
+  reader.onload = function(){
+    const img = new Image();
+    img.onload = function(){
+      /* compress to max 256px to keep storage small */
+      const canvas = document.createElement('canvas');
+      const max = 256;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      state.logos[i] = canvas.toDataURL('image/png');
+      syncTeamBoxes(); render(true); broadcast();
+      showToast('Logo uploaded for team ' + (i+1) + '!');
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function addTeam(){
+  if(state.teams.length >= state.n){ $('liveStatus').textContent = 'Bracket is full (' + state.n + ' teams). Switch to a bigger format to add more.'; return; }
+  state.teams.push('TEAM ' + (state.teams.length + 1));
+  state.logos.push('');
+  syncTeamBoxes(); validate(); render(); broadcast();
+}
+function swapSeeds(a, b){
+  const t = state.teams[a]; state.teams[a] = state.teams[b]; state.teams[b] = t;
+  const l = state.logos[a]; state.logos[a] = state.logos[b]; state.logos[b] = l;
+  syncTeamBoxes(); checkDuplicates(); validate(); render(); broadcast();
+  showToast('Teams swapped');
+}
+function placeTeamAt(teamIdx, seedIdx){
+  if(teamIdx < 0 || teamIdx >= state.teams.length) return;
+  const t = state.teams.splice(teamIdx, 1)[0];
+  const l = state.logos.splice(teamIdx, 1)[0] || '';
+  state.teams.splice(seedIdx, 0, t);
+  state.logos.splice(seedIdx, 0, l);
+  syncTeamBoxes(); checkDuplicates(); validate(); render(); broadcast();
+  showToast('Team moved to seed #' + (seedIdx + 1));
+}
+function removeSeed(i){
+  state.teams.splice(i, 1);
+  state.logos.splice(i, 1);
+  syncTeamBoxes(); checkDuplicates(); validate(); render(); broadcast();
+  showToast('Team removed from the bracket');
+}
+function inlineRename(span, oldName){
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = oldName;
+  inp.style.cssText = 'flex:1;min-width:0;min-height:26px;height:26px;padding:2px 6px;font-size:12px;background:rgba(255,255,255,.95);color:#04100f;border:1px solid #d9b64a;border-radius:6px;';
+  span.replaceWith(inp);
+  inp.focus(); inp.select();
+  let done = false;
+  function commit(){
+    if(done) return; done = true;
+    const v = inp.value.trim();
+    if(v && v !== oldName){
+      const ti = state.teams.indexOf(oldName);
+      if(ti !== -1) state.teams[ti] = v;
+      const di = state.dq.indexOf(oldName);
+      if(di !== -1) state.dq[di] = v;
+      syncTeamBoxes(); checkDuplicates(); validate(); render(); broadcast();
+      showToast('Renamed to "' + v + '"');
+    } else {
+      render(true);
+    }
+  }
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); commit(); }
+    if(e.key === 'Escape'){ done = true; render(true); }
+  });
+  inp.addEventListener('click', function(e){ e.stopPropagation(); });
+}
+function clearMatch(kind, r, m){
+  if(kind === 'gf'){ state.w.gf[r] = null; if(r === 0) state.w.gf[1] = null; }
+  else state.w[kind][r][m] = null;
+  Object.keys(state.scores).forEach(function(k){ if(k.indexOf(kind + '|' + r + '|' + m + '|') === 0) delete state.scores[k]; });
+  validate(); render(true); broadcast();
+  showToast('Match cleared');
+}
+function shuffleTeams(){
+  for(let i = state.teams.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const t1 = state.teams[i]; state.teams[i] = state.teams[j]; state.teams[j] = t1;
+    const t2 = state.logos[i]; state.logos[i] = state.logos[j]; state.logos[j] = t2;
+  }
+  syncTeamBoxes(); buildBracket(); broadcast();
+}
+
+/* ==================== RECORDS (LOCAL) ==================== */
+function getRecords(){ try{ return JSON.parse(localStorage.getItem('dgc_records') || '[]'); }catch(e){ return []; } }
+function saveRecord(){
+  const dups = checkDuplicates();
+  if(dups.length){ showToast('Fix duplicate team names first!', 'warning'); return; }
+  const name = $('recName').value.trim() || $('tName').value || 'Tournament';
+  const recs = getRecords();
+  recs.unshift({ id: Date.now(), name: name, saved: new Date().toLocaleString(), data: payload() });
+  try{ localStorage.setItem('dgc_records', JSON.stringify(recs)); }catch(e){}
+  $('recName').value = '';
+  renderRecords();
+  $('liveStatus').textContent = 'Saved to records: ' + name;
+}
+function renderRecords(){
+  const recs = getRecords();
+  const box = $('recList'); box.innerHTML = '';
+  if(!recs.length){ box.innerHTML = '<div class="hint">No saved tournaments yet.</div>'; return; }
+  recs.forEach(function(r){
+    const d = document.createElement('div'); d.className = 'rec-row';
+    d.innerHTML = '<div class="rec-info"><b>' + esc(r.name) + '</b><span>' + esc(r.saved) + ' \u00B7 ' + (r.data.mode === 'double' ? 'DOUBLE' : 'SINGLE') + ' \u00B7 ' + r.data.n + ' TEAMS</span></div>'
+      + '<button class="btn ghost rec-load" data-id="' + r.id + '"><i class="fa-solid fa-folder-open"></i> LOAD</button>'
+      + '<button class="btn ghost rec-del" data-id="' + r.id + '" title="Delete record"><i class="fa-solid fa-trash"></i></button>';
+    box.appendChild(d);
+  });
+  box.querySelectorAll('.rec-load').forEach(function(b){ b.onclick = function(){ loadRecord(+this.dataset.id); }; });
+  box.querySelectorAll('.rec-del').forEach(function(b){ b.onclick = function(){ deleteRecord(+this.dataset.id); }; });
+}
+function loadRecord(id){
+  const r = getRecords().find(function(x){ return x.id === id; });
+  if(!r) return;
+  applyRemote(r.data);
+  $('liveStatus').textContent = 'Loaded record: ' + r.name;
+}
+function deleteRecord(id){
+  if(!confirm('Delete this tournament record permanently?')) return;
+  try{ localStorage.setItem('dgc_records', JSON.stringify(getRecords().filter(function(x){ return x.id !== id; }))); }catch(e){}
+  renderRecords();
+}
+
+function renderSponsor(){
+  const wrap = $('bfQrWrap');
+  const show = $('showSponsor').checked;
+  wrap.style.display = show ? 'flex' : 'none';
+  const sn = $('sponsorName').value || 'DGC eSTORE';
+  $('spSponsor').textContent = sn;
+  makeQR($('sponsorQr'), $('sponsorUrl').value.trim(), 84);
+}
+
+/* ==================== BRACKET IMAGE EXPORT ==================== */
+async function snapshotNode(node){
+  const prevOverflow = node.style.overflowX;
+  const prevWidth = node.style.width;
+  node.classList.add('exporting');
+  node.style.overflowX = 'visible';
+  node.style.width = node.scrollWidth + 'px';
+  node.style.background = '#ffffff';
+  drawConnectors();
+  await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(r); }); });
+  try{
+    return await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, windowWidth: node.scrollWidth + 120 });
+  }finally{
+    node.classList.remove('exporting');
+    node.style.overflowX = prevOverflow;
+    node.style.width = prevWidth;
+  }
+}
+function downloadCanvas(canvas, name, type){
+  const a = document.createElement('a');
+  a.download = name + (type === 'jpg' ? '-bracket.jpg' : '-bracket.png');
+  a.href = (type === 'jpg') ? canvas.toDataURL('image/jpeg', 0.92) : canvas.toDataURL('image/png');
+  a.click();
+}
+async function downloadBracket(){
+  $('liveStatus').textContent = 'Rendering bracket image...';
+  try{
+    const canvas = await snapshotNode($('bracketArea'));
+    const name = ($('tName').value || 'bracket').replace(/[^\w\- ]/g, '').trim().replace(/\s+/g, '-').toLowerCase() || 'bracket';
+    downloadCanvas(canvas, name, 'png');
+    $('liveStatus').textContent = 'Bracket image downloaded! (PNG)';
+  }catch(err){ $('liveStatus').textContent = 'Download failed: ' + err; }
+}
+async function downloadBracketJpg(){
+  $('liveStatus').textContent = 'Rendering bracket image...';
+  try{
+    const canvas = await snapshotNode($('bracketArea'));
+    const name = ($('tName').value || 'bracket').replace(/[^\w\- ]/g, '').trim().replace(/\s+/g, '-').toLowerCase() || 'bracket';
+    downloadCanvas(canvas, name, 'jpg');
+    $('liveStatus').textContent = 'Bracket image downloaded! (JPG)';
+  }catch(err){ $('liveStatus').textContent = 'Download failed: ' + err; }
+}
+async function copyCanvasImage(canvas, okMsg){
+  return new Promise(function(resolve){
+    canvas.toBlob(async function(blob){
+      try{
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        resolve(true);
+      }catch(e){ resolve(false); }
+    }, 'image/png');
+  });
+}
+async function copyBracketImage(){
+  $('liveStatus').textContent = 'Rendering bracket image...';
+  try{
+    const canvas = await snapshotNode($('bracketArea'));
+    const ok = await copyCanvasImage(canvas);
+    $('liveStatus').textContent = ok ? 'Picture copied! Open Messenger, long-press the chat box, then tap Paste.' : 'Copy not supported — downloaded instead.';
+    if(!ok){ const a = document.createElement('a'); a.download = 'bracket.png'; a.href = canvas.toDataURL('image/png'); a.click(); }
+  }catch(err){ $('liveStatus').textContent = 'Copy failed: ' + err; }
+}
+
+/* ==================== LIVE PREVIEW ==================== */
+function toggleLive(){
+  const on = $('liveToggle').checked;
+  state.live = on;
+  const dot = $('liveDot');
+  dot.classList.toggle('on', on);
+  dot.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE ' + (on ? 'ON' : 'OFF');
+  $('liveStatus').textContent = on ? 'Live preview is ON \u2014 other teams can watch in real time.' : 'Live preview is OFF.';
+  if(on && !bc){ try{ bc = new BroadcastChannel('dgc_live_bracket'); bc.onmessage = function(e){ applyRemote(e.data); }; }catch(e){} }
+  broadcast();
+}
+function payload(){
+  return { mode: state.mode, n: state.n, teams: state.teams, logos: state.logos, dq: state.dq, times: state.times, scores: state.scores, sched: state.sched, w: state.w,
+    tName: $('tName').value, sponsorName: $('sponsorName').value, sponsorUrl: $('sponsorUrl').value, showSponsor: $('showSponsor').checked,
+    evDate: $('evDate').value, evTime: $('evTime').value, showDateTime: $('showDateTime').checked, ts: Date.now() };
+}
+function broadcast(){
+  if(!state.live) return;
+  const p = payload();
+  if(bc) try{ bc.postMessage(p); }catch(e){}
+  try{ localStorage.setItem('dgc_live_bracket', JSON.stringify(p)); }catch(e){}
+}
+function applyRemote(p){
+  state.mode = p.mode || 'single';
+  state.n = p.n || 8;
+  state.teams = p.teams || [];
+  state.logos = p.logos || [];
+  state.dq = p.dq || [];
+  state.times = p.times || [];
+  state.scores = p.scores || {};
+  state.sched = p.sched || {};
+  state.w = p.w;
+  $('tFormat').value = state.mode + '-' + state.n;
+  $('tName').value = p.tName || '';
+  $('sponsorName').value = p.sponsorName || '';
+  $('sponsorUrl').value = p.sponsorUrl || '';
+  $('showSponsor').checked = !!p.showSponsor;
+  $('evDate').value = p.evDate || '';
+  $('evTime').value = p.evTime || '';
+  $('showDateTime').checked = !!p.showDateTime;
+  $('teamsBox').value = (p.teams || []).join('\n');
+  const lb = $('logosBox'); if(lb) lb.value = (p.logos || []).join('\n');
+  $('timesBox').value = (p.times || []).join('\n');
+  checkDuplicates(); render();
+}
+function copyLiveLink(){
+  const p = payload();
+  const hash = btoa(unescape(encodeURIComponent(JSON.stringify(p))));
+  const url = location.href.split('#')[0] + '#live=' + hash;
+  navigator.clipboard.writeText(url).then(function(){ $('liveStatus').textContent = 'Live link copied! Share it with the teams.'; })
+    .catch(function(){ prompt('Copy this live link:', url); });
+}
+window.addEventListener('storage', function(e){
+  if(e.key === 'dgc_live_bracket' && e.newValue){ try{ applyRemote(JSON.parse(e.newValue)); }catch(err){} }
+});
+</script>
+
+<script>
+/* ==================== GENERIC DOC EXPORT HELPERS ==================== */
+async function snapDoc(docId){
+  const node = $(docId);
+  const wrap = node.closest('.doc-wrap') || node.parentElement;
+  const prev = wrap.style.overflowX;
+  wrap.style.overflowX = 'visible';
+  node.classList.add('exporting');
+  node.style.background = '#ffffff';
+  try{
+    return await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, windowWidth: node.scrollWidth + 100 });
+  }finally{
+    node.classList.remove('exporting');
+    wrap.style.overflowX = prev;
+  }
+}
+async function downloadDocPNG(docId, base){
+  const st = $(docId + 'Status'); if(st) st.textContent = 'Rendering...';
+  try{
+    const canvas = await snapDoc(docId);
+    const a = document.createElement('a');
+    a.download = base + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    if(st) st.textContent = 'Downloaded! (PNG)';
+  }catch(err){ if(st) st.textContent = 'Failed: ' + err; }
+}
+async function downloadDocJPG(docId, base){
+  const st = $(docId + 'Status'); if(st) st.textContent = 'Rendering...';
+  try{
+    const canvas = await snapDoc(docId);
+    const a = document.createElement('a');
+    a.download = base + '.jpg';
+    a.href = canvas.toDataURL('image/jpeg', 0.92);
+    a.click();
+    if(st) st.textContent = 'Downloaded! (JPG)';
+  }catch(err){ if(st) st.textContent = 'Failed: ' + err; }
+}
+async function copyDocImage(docId){
+  const st = $(docId + 'Status'); if(st) st.textContent = 'Rendering...';
+  try{
+    const canvas = await snapDoc(docId);
+    const ok = await copyCanvasImage(canvas);
+    if(st) st.textContent = ok ? 'Picture copied! Paste it in Messenger.' : 'Copy not supported — downloaded instead.';
+    if(!ok){ const a = document.createElement('a'); a.download = docId + '.png'; a.href = canvas.toDataURL('image/png'); a.click(); }
+  }catch(err){ if(st) st.textContent = 'Failed: ' + err; }
+}
+
+/* shared themed doc header / footer */
+function docHeader(title, sub){
+  let s = (sub || '').trim().replace(/"/g,'');
+  s = esc(s.replace(/`/g, "'"));
+  return '<div class="doc-header">'
+    + '<img class="dh-logo" src="https://i.imgur.com/gpTrmMn.png" alt="DGC" crossorigin="anonymous">'
+    + '<div class="dh-center"><div class="dh-title">' + esc(title || 'DGC ESPORTS') + '</div>'
+    + (s ? '<div class="dh-sub">' + s + '</div>' : '')
+    + '</div>'
+    + '</div>';
+}
+function docFooter(qrUrl, sponsorText){
+  return '<div class="doc-footer">'
+    + '<div class="bf-qr"><div class="bf-qr-col"><div id="dfQr"></div></div>'
+    + '<div class="bf-qr-right"><span class="sp-by">SPONSORED BY:</span><span class="sp-sponsor">' + esc(sponsorText || 'DGC eSTORE') + '</span></div></div>'
+    + '<img class="df-logo" src="https://i.imgur.com/jiS3Xh7.png" alt="" crossorigin="anonymous">'
+    + '</div>';
+}
+function paintDocQR(container, url){
+  const q = container.querySelector('#dfQr');
+  if(q) makeQR(q, url || $('sponsorUrl').value.trim(), 80);
+}
+
+/* ==================== RULES GENERATOR ==================== */
+function fillSampleRules(){
+  $('rulesTitle').value = 'OFFICIAL TOURNAMENT RULES';
+  $('rulesSub').value = $('tName').value || 'DGC QUICK CUP — SEASON 1';
+  $('rulesBox').value = [
+    'All participants must be registered before the tournament starts.',
+    'Match format is Best of 1, except Semifinals and Grand Finals (Best of 3).',
+    'Players must arrive 15 minutes before their scheduled match time.',
+    'Any form of cheating, bug abuse, or unauthorized third-party software results in immediate disqualification (DQ).',
+    'Team rosters are locked once the bracket is generated.',
+    'Substitutions are allowed only before the first match of the team starts.',
+    'Toxic behavior, trash talk beyond competitive banter, or harassment leads to a warning, then DQ.',
+    'Decisions of the tournament officials and organizer are final.',
+    'Prizes will be distributed within 7 days after the event.',
+    'By joining, all participants agree to these rules and to DGC Esports terms.'
+  ].join('\n');
+  renderRules();
+}
+function ruleIcon(t){
+  t = t.toLowerCase();
+  if(/cheat|hack|exploit|bug|third-party|software|smurf/.test(t)) return 'fa-user-shield';
+  if(/register|registration|sign\s?up|entry\s?form/.test(t)) return 'fa-id-card';
+  if(/disqualif|\bdq\b|penalt|ban\b/.test(t)) return 'fa-ban';
+  if(/best of|format|bo[0-9]|map|draft|pick/.test(t)) return 'fa-gamepad';
+  if(/arrive|schedule|time|minute|late|punctual/.test(t)) return 'fa-clock';
+  if(/roster|substitut|lineup|player|squad/.test(t)) return 'fa-users';
+  if(/toxic|trash|harass|behavior|respect/.test(t)) return 'fa-comment-slash';
+  if(/prize|award|reward|payout/.test(t)) return 'fa-trophy';
+  if(/decision|official|organizer|referee|final/.test(t)) return 'fa-gavel';
+  if(/stream|broadcast|record|screenshot|proof/.test(t)) return 'fa-tower-broadcast';
+  if(/fee|payment|buy-?in/.test(t)) return 'fa-money-bill';
+  if(/disconnect|lag|server|technical/.test(t)) return 'fa-plug-circle-xmark';
+  return 'fa-circle-check';
+}
+function renderRules(){
+  const title = $('rulesTitle').value.trim() || 'OFFICIAL TOURNAMENT RULES';
+  const sub = $('rulesSub').value.trim();
+  const lines = ($('rulesBox').value || '').split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  let body = '';
+  if(lines.length){
+    body = '<div class="rules-list">' + lines.map(function(l){
+      const clean = l.replace(/^\s*\d+[.)]\s*/, '');
+      return '<div class="rule-item"><span class="ricon"><i class="fa-solid ' + ruleIcon(clean) + '"></i></span>' + esc(clean) + '</div>';
+    }).join('') + '</div>';
+  } else {
+    body = '<div style="text-align:center;color:#0b3d3f;opacity:.5;padding:40px 10px;font-weight:700;letter-spacing:2px;">TYPE RULES ON THE LEFT TO PREVIEW</div>';
+  }
+  const doc = $('rulesDoc');
+  doc.innerHTML = docHeader(title, sub) + '<div class="doc-body">' + body + '</div>' + docFooter();
+  paintDocQR(doc);
+}
+
+/* ==================== STANDING BUILDER ==================== */
+function fillSampleStanding(){
+  $('standNames').value = ['DGC | CRONUS','DSUV','DGC | HERACLES','FROST BEER','ALPHA BLOODBATH','DGC | HADES','DGC | MORPHEUS','DGC | NEMESIS','DGC | CRIUS','DGC | DIONYSUS','DGC | HERMES','DGC | HYPERION','DGC | POSEIDON','DGC | PROMETHEUS','DGC | THANATOS','WVA EMPERORS'].join('\n');
+  $('standHist').value = ['W W W W W','W W W W L','W W W L','W W W L','W W L','W W L','W W L','W W L','W L','W L','W L','W L','W L','W L','W L','W L'].join('\n');
+  renderStanding();
+}
+function standNamesChanged(){ renderStanding(); }
+function autoFillStanding(){
+  const rec = computeRecords();
+  const ordered = state.teams.slice().sort(function(a, b){
+    const ra = rec[a] || {w:0,l:0}, rb = rec[b] || {w:0,l:0};
+    if(rb.w !== ra.w) return rb.w - ra.w;
+    return ra.l - rb.l;
+  });
+  const names = [], hist = [];
+  ordered.forEach(function(nm){
+    const r = rec[nm] || {w:0,l:0};
+    const total = Math.max(1, r.w + r.l);
+    const arr = [];
+    for(let i = 0; i < r.w; i++) arr.push('W');
+    for(let i = 0; i < r.l; i++) arr.push('L');
+    if(!arr.length) arr.push('\u2013');
+    names.push(nm);
+    hist.push(arr.join(' '));
+  });
+  $('standNames').value = names.join('\n');
+  $('standHist').value = hist.join('\n');
+  renderStanding();
+  showToast('Standing auto-filled from the current bracket!');
+}
+function renderStanding(){
+  const title = $('standTitle').value.trim() || 'OFFICIAL STANDING';
+  const org = $('standOrg').value.trim() || 'DexterousGC';
+  const names = ($('standNames').value || '').split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  const hists = ($('standHist').value || '').split('\n');
+  let rows = '';
+  names.forEach(function(nm, i){
+    const h = (hists[i] || '').trim();
+    const letters = h ? h.split(/\s+/).map(function(x){
+      const c = x.toUpperCase();
+      if(c === 'W') return '<span class="w">W</span>';
+      if(c === 'L') return '<span class="l">L</span>';
+      return '<span style="opacity:.5">\u2013</span>';
+    }).join(' ') : '<span style="opacity:.4">NO MATCHES</span>';
+    rows += '<tr><td class="st-rank">' + (i+1) + '</td><td>' + esc(nm) + '</td><td>' + letters + '</td></tr>';
+  });
+  let table;
+  if(names.length){
+    table = '<table class="stand-table"><thead><tr><th>RANK</th><th>PARTICIPANT NAME</th><th>MATCH HISTORY</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } else {
+    table = '<div style="text-align:center;color:#0b3d3f;opacity:.5;padding:40px 10px;font-weight:700;letter-spacing:2px;">ADD PARTICIPANTS ON THE LEFT</div>';
+  }
+  const doc = $('standingDoc');
+  doc.innerHTML = docHeader(title, 'ORGANIZER: ' + org.toUpperCase()) + '<div class="doc-body">' + table + '</div>' + docFooter();
+  paintDocQR(doc);
+}
+
+/* ==================== CERTIFICATE GENERATOR ==================== */
+const CERT_META = {
+  champion:    { award:'CHAMPION',      cls:'cert-medal-gold',   icon:'fa-medal',           desc:'has emerged as the undefeated CHAMPION of' },
+  second:      { award:'2ND PLACE',     cls:'cert-medal-silver', icon:'fa-medal',           desc:'has finished in 2ND PLACE at' },
+  semi:        { award:'SEMI-FINALIST', cls:'cert-medal-bronze', icon:'fa-medal',           desc:'has reached the SEMI-FINALS of' },
+  participant: { award:'PARTICIPANT',   cls:'cert-medal-part',   icon:'fa-certificate',     desc:'participated in' }
+};
+let certList = [], certIdx = 0;
+function certNamesChanged(){
+  certList = ($('certNames').value || '').split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  if(certIdx >= certList.length) certIdx = 0;
+  renderCert();
+}
+function certTypeChanged(){
+  if(!certList.length) certAutoFill(true);
+  else renderCert();
+}
+function certAutoFill(silent){
+  const type = $('certType').value;
+  let names = [];
+  if(type === 'champion'){ const c = champName(); if(c && c !== '\u2014') names = [c]; }
+  else if(type === 'second'){ const r = runnerUpName(); if(r) names = [r]; }
+  else if(type === 'semi'){ names = semiFinalists(); }
+  else { names = state.teams.filter(function(nm){ return nm && nm.trim() && !/^TEAM \d+$/i.test(nm.trim()); }); }
+  if(!names.length){
+    if(!silent) showToast('No data yet — finish some matches in the bracket first!', 'warning');
+    renderCert();
+    return;
+  }
+  $('certNames').value = names.join('\n');
+  const defT = 'DGC QUICK CUP \u2014 SEASON 1';
+  if(!$('certTourn').value.trim() || $('certTourn').value === defT) $('certTourn').value = $('tName').value.trim() || defT;
+  certNamesChanged();
+  if(!silent) showToast('Certificate names filled from the tournament!');
+}
+function certNav(dir){
+  if(!certList.length) return;
+  certIdx = (certIdx + dir + certList.length) % certList.length;
+  renderCert();
+}
+function renderCert(){
+  const type = $('certType').value;
+  const m = CERT_META[type] || CERT_META.participant;
+  if(!certList.length){
+    certList = ($('certNames').value || '').split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  }
+  const name = certList[certIdx] || 'PARTICIPANT NAME';
+  const tourn = $('certTourn').value.trim() || 'DGC ESPORTS TOURNAMENT';
+  const date = $('certDate').value.trim();
+  const org = $('certOrg').value.trim() || 'Reinayanne';
+  const sponsor = $('sponsorName').value || 'DGC eSTORE';
+  $('certCounter').textContent = (certList.length ? certIdx + 1 : 0) + ' / ' + certList.length;
+  $('certDoc').className = 'cert ' + m.cls;
+  $('certDoc').innerHTML =
+      '<div class="cert-hdr"><img src="https://i.imgur.com/gpTrmMn.png" alt="DGC" crossorigin="anonymous"></div>'
+    + '<div class="cert-goldline"></div>'
+    + '<div class="cert-inner">'
+    + '<div class="cert-award"><span class="medal-i"><i class="fa-solid ' + m.icon + '"></i></span>' + m.award + '</div>'
+    + '<div class="cert-presented">THIS CERTIFICATE IS PROUDLY PRESENTED TO</div>'
+    + '<div class="cert-name">' + esc(name) + '</div>'
+    + '<div class="cert-desc">for an outstanding performance — ' + esc(name) + ' ' + m.desc + '</div>'
+    + '<div class="cert-tourn">' + esc(tourn) + '</div>'
+    + '</div>'
+    + '<div class="cert-sigrow">'
+    + '<div class="sig-date">' + (date ? '<i class="fa-solid fa-calendar"></i> ' + esc(date) : '<span style="opacity:.4">DATE: __________________</span>') + '</div>'
+    + '<div class="sig-mid"><img src="https://i.imgur.com/jiS3Xh7.png" alt="DGC" crossorigin="anonymous"></div>'
+    + '<div style="text-align:center"><div class="sig-script">' + esc(org) + '</div><div class="sig-underline"></div><div class="sig-cap">ORGANIZER</div></div>'
+    + '</div>'
+    + '<div class="cert-ftr">'
+    + '<div class="bf-qcol"><div id="certQr"></div></div>'
+    + '<div class="bf-txt">SPONSORED BY:<br>' + esc(sponsor) + '</div>'
+    + '</div>';
+  makeQR($('certQr'), $('sponsorUrl').value.trim(), 68, '#0b3d3f');
+}
+async function downloadCert(){
+  if(!certList.length){ showToast('Add recipient names first!', 'warning'); return; }
+  $('certStatus').textContent = 'Rendering certificate...';
+  try{
+    const canvas = await snapDoc('certDoc');
+    const a = document.createElement('a');
+    a.download = 'certificate-' + certList[certIdx].replace(/[^\w\- ]/g,'').trim().replace(/\s+/g,'-').toLowerCase() + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    $('certStatus').textContent = 'Certificate downloaded!';
+  }catch(err){ $('certStatus').textContent = 'Failed: ' + err; }
+}
+async function copyCert(){
+  if(!certList.length){ showToast('Add recipient names first!', 'warning'); return; }
+  $('certStatus').textContent = 'Rendering certificate...';
+  try{
+    const canvas = await snapDoc('certDoc');
+    const ok = await copyCanvasImage(canvas);
+    $('certStatus').textContent = ok ? 'Certificate copied! Paste it in Messenger.' : 'Copy not supported — downloaded instead.';
+    if(!ok){ const a = document.createElement('a'); a.download = 'certificate.png'; a.href = canvas.toDataURL('image/png'); a.click(); }
+  }catch(err){ $('certStatus').textContent = 'Failed: ' + err; }
+}
+async function downloadAllCerts(){
+  if(!certList.length){ showToast('Add recipient names first!', 'warning'); return; }
+  $('certStatus').textContent = 'Rendering all certificates...';
+  for(let i = 0; i < certList.length; i++){
+    certIdx = i; renderCert();
+    try{
+      const canvas = await snapDoc('certDoc');
+      const a = document.createElement('a');
+      a.download = 'certificate-' + (i+1) + '-' + certList[i].replace(/[^\w\- ]/g,'').trim().replace(/\s+/g,'-').toLowerCase() + '.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+      await new Promise(function(r){ setTimeout(r, 400); });
+    }catch(err){}
+  }
+  $('certStatus').textContent = 'All ' + certList.length + ' certificates downloaded!';
+}
+
+/* ==================== BANNER GENERATOR ==================== */
+function renderBanner(){
+  const tag = $('banTag').value.trim();
+  const title = $('banTitle').value.trim() || 'DGC ESPORTS TOURNAMENT';
+  const sub = $('banSub').value.trim();
+  const date = $('banDate').value.trim();
+  const time = $('banTime').value.trim();
+  const prize = $('banPrize').value.trim();
+  const sponsor = $('banSponsor').value.trim() || 'DGC eSTORE';
+  let meta = '';
+  if(date) meta += '<span><i class="fa-solid fa-calendar"></i>' + esc(date) + '</span>';
+  if(time) meta += '<span><i class="fa-solid fa-clock"></i>' + esc(time) + '</span>';
+  $('bannerDoc').innerHTML =
+      '<div class="doc-header" style="justify-content:center;">'
+    + '<img class="dh-logo" src="https://i.imgur.com/gpTrmMn.png" alt="DGC" crossorigin="anonymous" style="margin:0 auto;">'
+    + '</div>'
+    + '<div class="doc-body" style="margin:0 0 18px;padding:36px 20px;border-radius:12px;background:#ffffff;">'
+    + '<div class="banner-inner" style="padding:8px;">'
+    + (tag ? '<div class="banner-tag" style="color:var(--teal-700);border-color:rgba(13,95,95,.45);background:rgba(13,95,95,.06);">' + esc(tag) + '</div>' : '')
+    + '<div class="banner-title" style="color:var(--teal-800);text-shadow:none;">' + esc(title) + '</div>'
+    + (sub ? '<div class="banner-sub" style="color:var(--teal-700);">' + esc(sub) + '</div>' : '')
+    + (meta ? '<div class="banner-meta" style="color:#123c3e;">' + meta + '</div>' : '')
+    + (prize ? '<div class="banner-prize" style="color:var(--gold-d);text-shadow:none;"><i class="fa-solid fa-trophy"></i> ' + esc(prize) + '</div>' : '')
+    + '</div></div>'
+    + '<div class="doc-footer">'
+    + '<div class="bf-qr"><div class="bf-qr-col"><div id="dfQrB"></div></div>'
+    + '<div class="bf-qr-right"><span class="sp-by">SPONSORED BY:</span><span class="sp-sponsor">' + esc(sponsor) + '</span></div></div>'
+    + '<img class="df-logo" src="https://i.imgur.com/jiS3Xh7.png" alt="" crossorigin="anonymous">'
+    + '</div>';
+  makeQR($('dfQrB'), $('sponsorUrl').value.trim(), 80);
+}
+
+/* ==================== TEAM LOGOS COLLAGE ==================== */
+function renderLogos(){
+  const title = $('tName').value.trim() || 'DGC TOURNAMENT';
+  let cells = '';
+  state.teams.forEach(function(nm, i){
+    const logo = safeLogo(state.logos[i]) || DEFAULT_LOGO;
+    cells += '<div class="lg-cell"><img class="lg-circle" src="' + logo + '" alt="" crossorigin="anonymous"><span class="lg-name">' + esc(nm) + '</span></div>';
+  });
+  if(!state.teams.length) cells = '<div style="text-align:center;color:#0b3d3f;opacity:.5;padding:30px;font-weight:700;width:100%;">SET TEAMS IN THE BRACKET TAB FIRST</div>';
+  const doc = $('logosDoc');
+  doc.innerHTML = docHeader('OFFICIAL TEAM ROSTER', title) 
+    + '<div class="doc-body"><div class="logos-count">' + state.teams.length + ' TEAMS CONFIRMED</div><div class="logos-grid">' + cells + '</div></div>'
+    + docFooter();
+  paintDocQR(doc);
+}
+
+/* ==================== FIREBASE (multi-device sync) ==================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAeN8HFUvdfCH4U7veGjo-a9-Pqv6Nd008",
+  authDomain: "dgc-estore.firebaseapp.com",
+  databaseURL: "https://dgc-estore-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "dgc-estore",
+  storageBucket: "dgc-estore.firebasestorage.app",
+  messagingSenderId: "620416266904",
+  appId: "1:620416266904:web:f4c2a075d1c48853ae16ed",
+  measurementId: "G-2MJ9HTQ3HH"
+};
+let database = null, firebaseOK = false;
+try{
+  if(typeof firebase !== 'undefined'){
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    firebaseOK = true;
+  }
+}catch(e){ firebaseOK = false; }
+
+const HUB_KEY = 'dgc_hub_tournaments';
+let hubData = [];
+let hubFilter = 'all';
+function hubLocal(){ try{ return JSON.parse(localStorage.getItem(HUB_KEY) || '[]'); }catch(e){ return []; } }
+function hubSaveLocal(list){ try{ localStorage.setItem(HUB_KEY, JSON.stringify(list)); }catch(e){} }
+function hubSetStatus(msg, ok){
+  const el = $('fbStatus');
+  el.className = 'fb-status ' + (ok ? 'ok' : 'off');
+  el.innerHTML = ok ? '<i class="fa-solid fa-cloud"></i> Firebase connected — saved tournaments open on ANY device.' : '<i class="fa-solid fa-cloud-arrow-down"></i> Firebase unavailable — using this device only (local mode).';
+}
+function hubListen(){
+  if(firebaseOK){
+    hubSetStatus('', true);
+    database.ref('tournamentHub').limitToLast(200).on('value', function(snapshot){
+      const list = [];
+      snapshot.forEach(function(child){ list.push(child.val()); });
+      hubData = list.sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
+      renderHub();
+    }, function(){ firebaseOK = false; hubSetStatus('', false); hubData = hubLocal(); renderHub(); });
+  } else {
+    hubSetStatus('', false);
+    hubData = hubLocal();
+    renderHub();
+  }
+}
+function hubSave(t){
+  if(firebaseOK) return database.ref('tournamentHub/' + t.id).set(t);
+  const list = hubLocal();
+  const i = list.findIndex(function(x){ return x.id === t.id; });
+  if(i >= 0) list[i] = t; else list.unshift(t);
+  hubSaveLocal(list);
+  hubData = list; renderHub();
+  return Promise.resolve();
+}
+function hubDelete(id){
+  if(firebaseOK) return database.ref('tournamentHub/' + id).remove().then(function(){ showToast('Tournament deleted'); });
+  hubSaveLocal(hubLocal().filter(function(x){ return x.id !== id; }));
+  hubData = hubLocal(); renderHub();
+  showToast('Tournament deleted');
+  return Promise.resolve();
+}
+function hubCreate(){
+  const name = $('hubName').value.trim();
+  if(!name){ showToast('Enter a tournament name first!', 'warning'); return; }
+  const dups = checkDuplicates();
+  if(dups.length && !confirm('Duplicate team names detected. Save anyway?')) return;
+  const t = {
+    id: 't' + Date.now(),
+    name: name,
+    status: $('hubStatusSel').value,
+    note: $('hubNote').value.trim(),
+    createdAt: Date.now(),
+    savedAt: new Date().toISOString(),
+    data: payload()
+  };
+  hubSave(t).then(function(){
+    $('hubName').value = ''; $('hubNote').value = '';
+    showToast('Tournament created: ' + name);
+  }).catch(function(err){ showToast('Save failed: ' + err, 'error'); });
+}
+function hubUpdate(id, patch){
+  const t = hubData.find(function(x){ return x.id === id; });
+  if(!t) return;
+  const updated = Object.assign({}, t, patch);
+  if(patch && patch.__saveCurrent) updated.data = payload();
+  delete updated.__saveCurrent;
+  hubSave(updated).then(function(){ showToast('Tournament updated'); });
+}
+function hubLoad(id){
+  const t = hubData.find(function(x){ return x.id === id; });
+  if(!t || !t.data) return;
+  applyRemote(t.data);
+  showView('view-bracket');
+  showToast('Loaded: ' + t.name);
+}
+function hubDeleteConfirm(id){
+  if(!confirm('Delete this tournament permanently from the cloud?')) return;
+  hubDelete(id);
+}
+function renderHub(){
+  ['all','upcoming','ongoing','pending','completed'].forEach(function(st){
+    const c = st === 'all' ? hubData.length : hubData.filter(function(t){ return t.status === st; }).length;
+    const el = $('cnt-' + st); if(el) el.textContent = c;
+  });
+  const stats = $('hubStats');
+  const counts = { upcoming:0, ongoing:0, pending:0, completed:0 };
+  hubData.forEach(function(t){ if(counts[t.status] !== undefined) counts[t.status]++; });
+  stats.innerHTML =
+      '<div class="stat-card"><b style="color:#14e3e3">' + counts.upcoming + '</b><span>UPCOMING</span></div>'
+    + '<div class="stat-card"><b style="color:#4ade80">' + counts.ongoing + '</b><span>ONGOING</span></div>'
+    + '<div class="stat-card"><b style="color:#ffb800">' + counts.pending + '</b><span>PENDING</span></div>'
+    + '<div class="stat-card"><b style="color:#f0d98c">' + counts.completed + '</b><span>COMPLETED</span></div>'
+    + '<div class="stat-card"><b>' + hubData.length + '</b><span>TOTAL</span></div>';
+  const list = $('hubList');
+  const filtered = hubFilter === 'all' ? hubData : hubData.filter(function(t){ return t.status === hubFilter; });
+  if(!filtered.length){
+    list.innerHTML = '<div class="hub-empty"><i class="fa-solid fa-inbox"></i> No ' + hubFilter + ' tournaments yet. Create one above!</div>';
+    return;
+  }
+  const STATUS_ICON = { upcoming:'fa-hourglass-start', ongoing:'fa-play', pending:'fa-pause', completed:'fa-check' };
+  list.innerHTML = '';
+  filtered.forEach(function(t){
+    const d = document.createElement('div'); d.className = 'rec-row';
+    const teams = (t.data && t.data.teams) ? t.data.teams.length : 0;
+    d.innerHTML =
+        '<div class="rec-info"><b>' + esc(t.name) + '</b>'
+      + '<span>' + esc(t.savedAt || '') + ' \u00B7 ' + teams + ' TEAMS' + (t.note ? ' \u00B7 ' + esc(t.note) : '') + '</span></div>'
+      + '<span class="chip ' + t.status + '"><i class="fa-solid ' + (STATUS_ICON[t.status] || 'fa-trophy') + '"></i> ' + t.status + '</span>'
+      + '<select class="hub-st-sel" data-id="' + t.id + '" style="min-height:34px;width:auto;font-size:11px;padding:4px 8px;">'
+      + ['upcoming','ongoing','pending','completed'].map(function(s){ return '<option value="' + s + '"' + (s === t.status ? ' selected' : '') + '>' + s.toUpperCase() + '</option>'; }).join('')
+      + '</select>'
+      + '<button class="btn ghost hub-load" data-id="' + t.id + '"><i class="fa-solid fa-folder-open"></i> LOAD</button>'
+      + '<button class="btn hub-savecur" data-id="' + t.id + '" title="Overwrite with the current bracket"><i class="fa-solid fa-floppy-disk"></i> UPDATE</button>'
+      + '<button class="btn ghost rec-del hub-del" data-id="' + t.id + '"><i class="fa-solid fa-trash"></i></button>';
+    list.appendChild(d);
+  });
+  list.querySelectorAll('.hub-st-sel').forEach(function(sel){
+    sel.onchange = function(){ hubUpdate(this.dataset.id, { status: this.value }); };
+  });
+  list.querySelectorAll('.hub-load').forEach(function(b){ b.onclick = function(){ hubLoad(this.dataset.id); }; });
+  list.querySelectorAll('.hub-savecur').forEach(function(b){ b.onclick = function(){ if(confirm('Overwrite this tournament with the CURRENT bracket?')) hubUpdate(this.dataset.id, { __saveCurrent:true, savedAt:new Date().toISOString() }); }; });
+  list.querySelectorAll('.hub-del').forEach(function(b){ b.onclick = function(){ hubDeleteConfirm(this.dataset.id); }; });
+}
+
+/* ==================== NAV ==================== */
+function showView(id){
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  $(id).classList.add('active');
+  document.querySelectorAll('#mainNav button').forEach(function(b){ b.classList.toggle('active', b.dataset.view === id); });
+  if(id === 'view-rules') renderRules();
+  if(id === 'view-standing') renderStanding();
+  if(id === 'view-certs') renderCert();
+  if(id === 'view-banner') renderBanner();
+  if(id === 'view-logos') renderLogos();
+  if(id === 'view-hub') renderHub();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('#mainNav button').forEach(function(b){
+  b.onclick = function(){ showView(this.dataset.view); };
+});
+document.querySelectorAll('#hubTabs button').forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll('#hubTabs button').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    hubFilter = b.dataset.st;
+    renderHub();
+  };
+});
+
+/* responsive: stack generator layouts on narrow screens */
+function fixLayouts(){
+  const narrow = window.innerWidth < 1000;
+  document.querySelectorAll('.gen-layout').forEach(function(el){ el.style.gridTemplateColumns = narrow ? '1fr' : ''; });
+  const bl = $('bracketLayout'); if(bl) bl.style.gridTemplateColumns = narrow ? '1fr' : '';
+}
+window.addEventListener('resize', fixLayouts);
+
+/* ==================== INIT ==================== */
+(function(){
+  fixLayouts();
+  renderRecords();
+  renderSponsor();
+  hubListen();
+  let loaded = false;
+  if(location.hash.startsWith('#live=')){
+    try{
+      const p = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(6)))));
+      state.live = true;
+      $('liveToggle').checked = true;
+      applyRemote(p);
+      const dot = $('liveDot');
+      dot.classList.add('on');
+      dot.innerHTML = '<i class="fa-solid fa-circle"></i> LIVE ON';
+      $('liveStatus').textContent = 'You are viewing a live bracket link.';
+      loaded = true;
+    }catch(e){}
+  }
+  if(!loaded){
+    try{
+      const saved = JSON.parse(localStorage.getItem('dgc_bracket') || 'null');
+      if(saved && saved.w){
+        state.mode = saved.mode || 'single';
+        state.n = saved.n || 8;
+        state.teams = saved.teams || [];
+        state.logos = saved.logos || [];
+        state.dq = saved.dq || [];
+        state.times = saved.times || [];
+        state.scores = saved.scores || {};
+        state.sched = saved.sched || {};
+        state.w = saved.w;
+        $('tName').value = saved.tName || '';
+        $('teamsBox').value = state.teams.join('\n');
+        const lb = $('logosBox'); if(lb) lb.value = (state.logos || []).join('\n');
+        $('timesBox').value = (state.times || []).join('\n');
+        $('evDate').value = saved.evDate || '';
+        $('evTime').value = saved.evTime || '';
+        $('showDateTime').checked = !!saved.showDateTime;
+        $('tFormat').value = state.mode + '-' + state.n;
+        loaded = true;
+      }
+    }catch(e){}
+  }
+  if(loaded) render(); else buildBracket();
+  renderRules(); renderStanding(); renderCert(); renderBanner(); renderLogos();
+})();
+</script>
+</body>
+</html>
